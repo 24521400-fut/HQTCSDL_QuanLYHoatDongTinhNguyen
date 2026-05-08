@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FILE: 01_sequences.sql
 -- MUC DICH: Tao tat ca SEQUENCES cho he thong quan ly hoat dong tinh nguyen
 -- CHAY TRUOC: Tat ca cac file khac
@@ -147,8 +147,6 @@ CREATE SEQUENCE s_thamso_id
 
 COMMIT;
 PROMPT >> 01_sequences.sql: Da tao xong tat ca SEQUENCES.
-
-
 -- ============================================================
 -- FILE: 02_tables.sql
 -- MUC DICH: Tao tat ca BANG DU LIEU cho he thong quan ly hoat dong tinh nguyen
@@ -620,8 +618,6 @@ CREATE TABLE TheoDoi (
 
 COMMIT;
 PROMPT >> 02_tables.sql: Da tao xong tat ca BANG DU LIEU voi RANG BUOC.
-
-
 -- ============================================================
 -- FILE: 03_indexes.sql
 -- MUC DICH: Tao tat ca INDEXES de toi uu hieu nang truy van
@@ -714,8 +710,6 @@ CREATE INDEX IDX_TD_CD               ON TheoDoi(MaChienDich);
 
 COMMIT;
 PROMPT >> 03_indexes.sql: Da tao xong tat ca INDEXES.
-
-
 -- ============================================================
 -- FILE: 04_triggers_auto_pk.sql
 -- MUC DICH: Tao TRIGGERS tu dong gan Khoa Chinh tu SEQUENCES khi INSERT
@@ -964,8 +958,6 @@ END;
 
 COMMIT;
 PROMPT >> 04_triggers_auto_pk.sql: Da tao xong tat ca TRIGGERS tu dong gan PK.
-
-
 -- ============================================================
 -- FILE: 05_triggers_business.sql
 -- MUC DICH: Implement 9 Triggers theo yeu cau
@@ -983,7 +975,7 @@ BEGIN
     FROM ChienDich WHERE MaChienDich = :NEW.MaChienDich;
     
     IF v_SoLuongHienTai >= v_SoLuongToiDa THEN
-        RAISE_APPLICATION_ERROR(-20002, 'Chiến dịch đã đủ số lượng tình nguyện viên.');
+        RAISE_APPLICATION_ERROR(-20002, 'Chiáº¿n dá»‹ch Ä‘Ã£ Ä‘á»§ sá»‘ lÆ°á»£ng tÃ¬nh nguyá»‡n viÃªn.');
     END IF;
 END;
 /
@@ -1027,7 +1019,7 @@ BEGIN
       );
 
     IF v_Count > 0 THEN
-        RAISE_APPLICATION_ERROR(-20003, 'Trùng lịch với chiến dịch khác đang tham gia hoặc chờ duyệt.');
+        RAISE_APPLICATION_ERROR(-20003, 'TrÃ¹ng lá»‹ch vá»›i chiáº¿n dá»‹ch khÃ¡c Ä‘ang tham gia hoáº·c chá» duyá»‡t.');
     END IF;
 END;
 /
@@ -1057,12 +1049,12 @@ DECLARE
     v_Count NUMBER;
 BEGIN
     IF :OLD.TrangThai = 'DangHoatDong' THEN
-        RAISE_APPLICATION_ERROR(-20005, 'Không thể xóa chiến dịch đang hoạt động. Hãy đổi trạng thái sang Hủy.');
+        RAISE_APPLICATION_ERROR(-20005, 'KhÃ´ng thá»ƒ xÃ³a chiáº¿n dá»‹ch Ä‘ang hoáº¡t Ä‘á»™ng. HÃ£y Ä‘á»•i tráº¡ng thÃ¡i sang Há»§y.');
     END IF;
 
     SELECT COUNT(*) INTO v_Count FROM ThamGiaTNV WHERE MaChienDich = :OLD.MaChienDich;
     IF v_Count > 0 THEN
-        RAISE_APPLICATION_ERROR(-20006, 'Không thể xóa chiến dịch đã có người đăng ký. Hãy đổi trạng thái sang Hủy.');
+        RAISE_APPLICATION_ERROR(-20006, 'KhÃ´ng thá»ƒ xÃ³a chiáº¿n dá»‹ch Ä‘Ã£ cÃ³ ngÆ°á»i Ä‘Äƒng kÃ½. HÃ£y Ä‘á»•i tráº¡ng thÃ¡i sang Há»§y.');
     END IF;
 END;
 /
@@ -1076,7 +1068,7 @@ DECLARE
 BEGIN
     SELECT TO_NUMBER(GiaTri) INTO v_TuoiToiThieu FROM ThamSo WHERE TenThamSo = 'TUOI_TOI_THIEU';
     IF MONTHS_BETWEEN(SYSDATE, :NEW.NgaySinh) / 12 < v_TuoiToiThieu THEN
-        RAISE_APPLICATION_ERROR(-20007, 'Tình nguyện viên phải từ đủ ' || v_TuoiToiThieu || ' tuổi trở lên.');
+        RAISE_APPLICATION_ERROR(-20007, 'TÃ¬nh nguyá»‡n viÃªn pháº£i tá»« Ä‘á»§ ' || v_TuoiToiThieu || ' tuá»•i trá»Ÿ lÃªn.');
     END IF;
 END;
 /
@@ -1099,10 +1091,10 @@ BEFORE INSERT OR UPDATE ON ChienDich
 FOR EACH ROW
 BEGIN
     IF :NEW.NgayBatDau < TRUNC(SYSDATE) THEN
-        RAISE_APPLICATION_ERROR(-20008, 'Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.');
+        RAISE_APPLICATION_ERROR(-20008, 'NgÃ y báº¯t Ä‘áº§u pháº£i lá»›n hÆ¡n hoáº·c báº±ng ngÃ y hiá»‡n táº¡i.');
     END IF;
     IF :NEW.NgayKetThuc IS NOT NULL AND :NEW.NgayKetThuc < :NEW.NgayBatDau THEN
-        RAISE_APPLICATION_ERROR(-20009, 'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.');
+        RAISE_APPLICATION_ERROR(-20009, 'NgÃ y káº¿t thÃºc pháº£i lá»›n hÆ¡n hoáº·c báº±ng ngÃ y báº¯t Ä‘áº§u.');
     END IF;
 END;
 /
@@ -1123,12 +1115,10 @@ BEGIN
       AND TrangThai IN ('ChuaBatDau', 'DangThucHien');
       
     IF v_Count >= v_MaxTasks THEN
-        RAISE_APPLICATION_ERROR(-20010, 'Tình nguyện viên chỉ được nhận tối đa ' || v_MaxTasks || ' nhiệm vụ đang chờ hoặc đang xử lý cùng lúc.');
+        RAISE_APPLICATION_ERROR(-20010, 'TÃ¬nh nguyá»‡n viÃªn chá»‰ Ä‘Æ°á»£c nháº­n tá»‘i Ä‘a ' || v_MaxTasks || ' nhiá»‡m vá»¥ Ä‘ang chá» hoáº·c Ä‘ang xá»­ lÃ½ cÃ¹ng lÃºc.');
     END IF;
 END;
 /
-
-
 -- ============================================================
 -- FILE: 06_stored_procedures.sql
 -- MUC DICH: Implement 31 SPs
@@ -1456,7 +1446,7 @@ AS
     v_MaPhieu VARCHAR2(10);
 BEGIN
     INSERT INTO PhieuQuyenGopVP(MaPhieuQG, MaTaiKhoan, MaChienDich, NguoiNhan)
-    VALUES (NULL, 1, p_MaCD, 'Admin')
+    VALUES (NULL, (SELECT MIN(MaTaiKhoan) FROM TaiKhoan WHERE VaiTro = 'BanQuanLy'), p_MaCD, 'Admin')
     RETURNING MaPhieuQG INTO v_MaPhieu;
     
     INSERT INTO ChiTietQuyenGopVP(MaPhieuQG, MaLoai, SoLuong)
@@ -1612,18 +1602,6 @@ BEGIN
 END;
 /
 
--- 33. SP_XOA_CHIENDICH
-CREATE OR REPLACE PROCEDURE SP_XOA_CHIENDICH (
-    p_MaCD IN VARCHAR2
-)
-AS
-BEGIN
-    -- Tat ca reference (BanDieuHanh, PhanCong, ...) se tu dong xoa nho ON DELETE CASCADE
-    DELETE FROM ChienDich WHERE MaChienDich = p_MaCD;
-END;
-/
-
-
 -- ============================================================
 -- FILE: 07_stored_functions.sql
 -- MUC DICH: Implement 6 SFs
@@ -1756,13 +1734,12 @@ BEGIN
     RETURN v_SoLuong;
 END;
 /
-
-
 -- ============================================================
 -- FILE: 08_SeedData.sql
 -- MUC DICH: Tong hop cac lenh INSERT du lieu mau (Seed Data) cho toan bo database.
 -- ============================================================
 SET SERVEROUTPUT ON;
+SET DEFINE OFF;
 DECLARE
     -- Mang luu ID de dung cho viec map FK
     TYPE t_arr IS TABLE OF VARCHAR2(10) INDEX BY PLS_INTEGER;
@@ -1780,6 +1757,25 @@ DECLARE
     v_tmp2 VARCHAR2(10);
 BEGIN
     DBMS_OUTPUT.PUT_LINE('Bat dau tao Seed Data...');
+
+    -- 0. THAM SO HE THONG (Phai insert truoc vi Triggers va Functions phu thuoc)
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('TUOI_TOI_THIEU', '16', 'Tuoi toi thieu de tham gia tinh nguyen');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('SO_NHIEM_VU_TOI_DA', '5', 'So nhiem vu toi da 1 TNV duoc nhan cung luc');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('GIO_CONG_MAC_DINH', '8', 'So gio toi thieu mac dinh de nhan chung nhan');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('DIEM_XUAT_SAC', '9', 'Nguong diem xep loai Xuat Sac');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('GIO_XUAT_SAC', '40', 'Nguong gio xep loai Xuat Sac');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('DIEM_TOT', '7', 'Nguong diem xep loai Tot');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('GIO_TOT', '30', 'Nguong gio xep loai Tot');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('DIEM_KHA', '5', 'Nguong diem xep loai Kha');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('GIO_KHA', '20', 'Nguong gio xep loai Kha');
+    INSERT INTO ThamSo(TenThamSo, GiaTri, GhiChu) VALUES ('NGUONG_TON_KHO_CANH_BAO', '10', 'Nguong canh bao ton kho thap');
+    DBMS_OUTPUT.PUT_LINE('>> Da insert ThamSo.');
+
+    -- Disable cac triggers nghiep vu de insert du lieu mau (ngay qua khu, trung lich, ...)
+    EXECUTE IMMEDIATE 'ALTER TRIGGER TRG_KIEMTRA_THOIGIAN DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER TRG_KIEMTRA_TRUNG_LICH DISABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER TRG_KIEMTRA_SOLUONG_DANGKY DISABLE';
+    DBMS_OUTPUT.PUT_LINE('>> Da disable triggers nghiep vu de insert seed data.');
 
     -- 1. TAI KHOAN QUAN TRI (Ban Quan Ly - 2 User)
     INSERT INTO TaiKhoan(TenDangNhap, MatKhau, Email, VaiTro, TrangThai) VALUES ('admin01', '123456', 'admin01@vnuhcm.edu.vn', 'BanQuanLy', 'HoatDong') RETURNING MaTaiKhoan INTO v_tmp;
@@ -2004,218 +2000,218 @@ BEGIN
     INSERT INTO HoSoSinhVien(MaTaiKhoan, HoTen, MSSV, NgaySinh, GioiTinh, Khoa, Lop, SoDienThoai, DiaChi) VALUES (v_tmp, 'Sinh Vien Thu 50', '22520050', DATE '2004-05-15', 'Nam', 'Khoa CNTT', 'KTPM2022', '0988000050', 'KTX Khu A, DHQG-HCM');
 
     -- 4. DOI TAC (5 Doi Tac)
-    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('Hội Sinh viên ĐHQG-HCM', 'Quản lý tổ chức', '02838647256', 'hsv@vnuhcm.edu.vn', 'Phường Linh Trung, TP. Thủ Đức') RETURNING MaDoiTac INTO v_tmp;
+    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('Há»™i Sinh viÃªn ÄHQG-HCM', 'Quáº£n lÃ½ tá»• chá»©c', '02838647256', 'hsv@vnuhcm.edu.vn', 'PhÆ°á»ng Linh Trung, TP. Thá»§ Äá»©c') RETURNING MaDoiTac INTO v_tmp;
     v_dt_ids(1) := v_tmp;
-    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('Ngân hàng Agribank Chi nhánh Đông SG', 'Tài trợ tài chính', '02838960123', 'dongsg@agribank.com.vn', 'TP. Thủ Đức, TP.HCM') RETURNING MaDoiTac INTO v_tmp;
+    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('NgÃ¢n hÃ ng Agribank Chi nhÃ¡nh ÄÃ´ng SG', 'TÃ i trá»£ tÃ i chÃ­nh', '02838960123', 'dongsg@agribank.com.vn', 'TP. Thá»§ Äá»©c, TP.HCM') RETURNING MaDoiTac INTO v_tmp;
     v_dt_ids(2) := v_tmp;
-    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('Công ty Cổ phần Sữa Vinamilk', 'Tài trợ nhu yếu phẩm', '02854155555', 'cskh@vinamilk.com.vn', 'Quận 7, TP.HCM') RETURNING MaDoiTac INTO v_tmp;
+    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('CÃ´ng ty Cá»• pháº§n Sá»¯a Vinamilk', 'TÃ i trá»£ nhu yáº¿u pháº©m', '02854155555', 'cskh@vinamilk.com.vn', 'Quáº­n 7, TP.HCM') RETURNING MaDoiTac INTO v_tmp;
     v_dt_ids(3) := v_tmp;
-    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('Nhà văn hóa Sinh viên TP.HCM', 'Cơ sở vật chất', '02838224382', 'lienhe@nvhsv.org.vn', 'Khu đô thị ĐHQG-HCM') RETURNING MaDoiTac INTO v_tmp;
+    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('NhÃ  vÄƒn hÃ³a Sinh viÃªn TP.HCM', 'CÆ¡ sá»Ÿ váº­t cháº¥t', '02838224382', 'lienhe@nvhsv.org.vn', 'Khu Ä‘Ã´ thá»‹ ÄHQG-HCM') RETURNING MaDoiTac INTO v_tmp;
     v_dt_ids(4) := v_tmp;
-    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('Bệnh viện Chợ Rẫy', 'Y tế', '02838554137', 'bvchoray@choray.vn', 'Quận 5, TP.HCM') RETURNING MaDoiTac INTO v_tmp;
+    INSERT INTO DoiTac(TenDoiTac, LinhVuc, SoDienThoai, Email, DiaChi) VALUES ('Bá»‡nh viá»‡n Chá»£ Ráº«y', 'Y táº¿', '02838554137', 'bvchoray@choray.vn', 'Quáº­n 5, TP.HCM') RETURNING MaDoiTac INTO v_tmp;
     v_dt_ids(5) := v_tmp;
 
     -- 5. LOAI VAT PHAM (10 Loai)
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Áo Mùa Hè Xanh', 'Cái', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Ão MÃ¹a HÃ¨ Xanh', 'CÃ¡i', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(1) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Áo Tiếp Sức Mùa Thi', 'Cái', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Ão Tiáº¿p Sá»©c MÃ¹a Thi', 'CÃ¡i', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(2) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Nón tai bèo', 'Cái', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('NÃ³n tai bÃ¨o', 'CÃ¡i', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(3) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Nước suối đóng chai', 'Thùng', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('NÆ°á»›c suá»‘i Ä‘Ã³ng chai', 'ThÃ¹ng', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(4) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Sữa hộp', 'Thùng', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Sá»¯a há»™p', 'ThÃ¹ng', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(5) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Mì tôm', 'Thùng', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('MÃ¬ tÃ´m', 'ThÃ¹ng', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(6) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Cuốc xẻng', 'Cái', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Cuá»‘c xáº»ng', 'CÃ¡i', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(7) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Sách vở học sinh', 'Bộ', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('SÃ¡ch vá»Ÿ há»c sinh', 'Bá»™', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(8) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Thuốc men cơ bản', 'Hộp', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Thuá»‘c men cÆ¡ báº£n', 'Há»™p', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(9) := v_tmp;
-    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Áo ấm', 'Cái', 0) RETURNING MaLoai INTO v_tmp;
+    INSERT INTO LoaiVatPham(TenLoai, DonViTinh, SoLuongTon) VALUES ('Ão áº¥m', 'CÃ¡i', 0) RETURNING MaLoai INTO v_tmp;
     v_loai_ids(10) := v_tmp;
 
     -- 6. CHIEN DICH (20 Chien Dich map 1-1 voi Ban Dieu Hanh)
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Xuân Tình Nguyện 2024 - KTX ĐHQG-HCM', DATE '2024-01-05', DATE '2024-02-05', 'Mang không khí xuân đến với các bạn sinh viên xa nhà tại Ký túc xá ĐHQG-HCM.', 150, 20000000, 'DaKetThuc', v_tk_dieuhanh(1), NULL) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('XuÃ¢n TÃ¬nh Nguyá»‡n 2024 - KTX ÄHQG-HCM', DATE '2024-01-05', DATE '2024-02-05', 'Mang khÃ´ng khÃ­ xuÃ¢n Ä‘áº¿n vá»›i cÃ¡c báº¡n sinh viÃªn xa nhÃ  táº¡i KÃ½ tÃºc xÃ¡ ÄHQG-HCM.', 150, 20000000, 'DaKetThuc', v_tk_dieuhanh(1), NULL) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(1) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(1), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-01-05');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(1) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(2) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Xuân Tình Nguyện 2024 - KTX ĐHQG-HCM', 'Noi dung phat dong...', v_tk_dieuhanh(1));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Xuân Tình Nguyện 2024 - Mái ấm tình thương', DATE '2024-01-10', DATE '2024-02-08', 'Chăm lo tết cho trẻ em mồ côi tại các mái ấm trên địa bàn TP.Thủ Đức.', 50, 15000000, 'DaKetThuc', v_tk_dieuhanh(2), NULL) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong XuÃ¢n TÃ¬nh Nguyá»‡n 2024 - KTX ÄHQG-HCM', 'Noi dung phat dong...', v_tk_dieuhanh(1));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('XuÃ¢n TÃ¬nh Nguyá»‡n 2024 - MÃ¡i áº¥m tÃ¬nh thÆ°Æ¡ng', DATE '2024-01-10', DATE '2024-02-08', 'ChÄƒm lo táº¿t cho tráº» em má»“ cÃ´i táº¡i cÃ¡c mÃ¡i áº¥m trÃªn Ä‘á»‹a bÃ n TP.Thá»§ Äá»©c.', 50, 15000000, 'DaKetThuc', v_tk_dieuhanh(2), NULL) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(2) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(2), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-01-10');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(3) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(4) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Xuân Tình Nguyện 2024 - Mái ấm tình thương', 'Noi dung phat dong...', v_tk_dieuhanh(2));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Mùa Hè Xanh 2024 - Mặt trận tỉnh Bến Tre', DATE '2024-07-01', DATE '2024-08-01', 'Xây dựng cầu đường nông thôn, thắp sáng đường quê và dạy học cho trẻ em tại Bến Tre.', 300, 100000000, 'DaKetThuc', v_tk_dieuhanh(3), 60) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong XuÃ¢n TÃ¬nh Nguyá»‡n 2024 - MÃ¡i áº¥m tÃ¬nh thÆ°Æ¡ng', 'Noi dung phat dong...', v_tk_dieuhanh(2));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('MÃ¹a HÃ¨ Xanh 2024 - Máº·t tráº­n tá»‰nh Báº¿n Tre', DATE '2024-07-01', DATE '2024-08-01', 'XÃ¢y dá»±ng cáº§u Ä‘Æ°á»ng nÃ´ng thÃ´n, tháº¯p sÃ¡ng Ä‘Æ°á»ng quÃª vÃ  dáº¡y há»c cho tráº» em táº¡i Báº¿n Tre.', 300, 100000000, 'DaKetThuc', v_tk_dieuhanh(3), 60) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(3) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(3), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-07-01');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(5) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(6) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Mùa Hè Xanh 2024 - Mặt trận tỉnh Bến Tre', 'Noi dung phat dong...', v_tk_dieuhanh(3));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Mùa Hè Xanh 2024 - Mặt trận TP.HCM', DATE '2024-07-05', DATE '2024-08-05', 'Dọn dẹp vệ sinh kênh rạch, tuyên truyền phòng chống dịch bệnh tại các quận ven.', 500, 50000000, 'DaKetThuc', v_tk_dieuhanh(4), 40) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong MÃ¹a HÃ¨ Xanh 2024 - Máº·t tráº­n tá»‰nh Báº¿n Tre', 'Noi dung phat dong...', v_tk_dieuhanh(3));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('MÃ¹a HÃ¨ Xanh 2024 - Máº·t tráº­n TP.HCM', DATE '2024-07-05', DATE '2024-08-05', 'Dá»n dáº¹p vá»‡ sinh kÃªnh ráº¡ch, tuyÃªn truyá»n phÃ²ng chá»‘ng dá»‹ch bá»‡nh táº¡i cÃ¡c quáº­n ven.', 500, 50000000, 'DaKetThuc', v_tk_dieuhanh(4), 40) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(4) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(4), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-07-05');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(7) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(8) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Mùa Hè Xanh 2024 - Mặt trận TP.HCM', 'Noi dung phat dong...', v_tk_dieuhanh(4));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Mùa Hè Xanh 2024 - Mặt trận Đắk Nông', DATE '2024-07-10', DATE '2024-08-10', 'Hỗ trợ bà con dân tộc thiểu số phát triển kinh tế, xây dựng nhà tình thương.', 100, 150000000, 'DaKetThuc', v_tk_dieuhanh(5), 80) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong MÃ¹a HÃ¨ Xanh 2024 - Máº·t tráº­n TP.HCM', 'Noi dung phat dong...', v_tk_dieuhanh(4));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('MÃ¹a HÃ¨ Xanh 2024 - Máº·t tráº­n Äáº¯k NÃ´ng', DATE '2024-07-10', DATE '2024-08-10', 'Há»— trá»£ bÃ  con dÃ¢n tá»™c thiá»ƒu sá»‘ phÃ¡t triá»ƒn kinh táº¿, xÃ¢y dá»±ng nhÃ  tÃ¬nh thÆ°Æ¡ng.', 100, 150000000, 'DaKetThuc', v_tk_dieuhanh(5), 80) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(5) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(5), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-07-10');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(9) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(10) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Mùa Hè Xanh 2024 - Mặt trận Đắk Nông', 'Noi dung phat dong...', v_tk_dieuhanh(5));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Tiếp Sức Mùa Thi 2024 - Cụm thi ĐHQG', DATE '2024-06-25', DATE '2024-07-05', 'Hỗ trợ thí sinh tham gia kỳ thi THPT Quốc gia tại cụm thi Làng Đại Học.', 800, 20000000, 'DaKetThuc', v_tk_dieuhanh(6), 15) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong MÃ¹a HÃ¨ Xanh 2024 - Máº·t tráº­n Äáº¯k NÃ´ng', 'Noi dung phat dong...', v_tk_dieuhanh(5));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Tiáº¿p Sá»©c MÃ¹a Thi 2024 - Cá»¥m thi ÄHQG', DATE '2024-06-25', DATE '2024-07-05', 'Há»— trá»£ thÃ­ sinh tham gia ká»³ thi THPT Quá»‘c gia táº¡i cá»¥m thi LÃ ng Äáº¡i Há»c.', 800, 20000000, 'DaKetThuc', v_tk_dieuhanh(6), 15) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(6) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(6), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-06-25');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(11) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(12) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Tiếp Sức Mùa Thi 2024 - Cụm thi ĐHQG', 'Noi dung phat dong...', v_tk_dieuhanh(6));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Chủ Nhật Xanh đợt 1 - Xây dựng Không gian xanh', DATE '2024-03-10', DATE '2024-03-10', 'Dọn dẹp rác thải và trồng cây xanh quanh khu vực hồ Đá và Làng Đại Học.', 200, 5000000, 'DaKetThuc', v_tk_dieuhanh(7), 4) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Tiáº¿p Sá»©c MÃ¹a Thi 2024 - Cá»¥m thi ÄHQG', 'Noi dung phat dong...', v_tk_dieuhanh(6));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Chá»§ Nháº­t Xanh Ä‘á»£t 1 - XÃ¢y dá»±ng KhÃ´ng gian xanh', DATE '2024-03-10', DATE '2024-03-10', 'Dá»n dáº¹p rÃ¡c tháº£i vÃ  trá»“ng cÃ¢y xanh quanh khu vá»±c há»“ ÄÃ¡ vÃ  LÃ ng Äáº¡i Há»c.', 200, 5000000, 'DaKetThuc', v_tk_dieuhanh(7), 4) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(7) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(7), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-03-10');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(13) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(14) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Chủ Nhật Xanh đợt 1 - Xây dựng Không gian xanh', 'Noi dung phat dong...', v_tk_dieuhanh(7));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Ngày hội Hiến Máu Tình Nguyện đợt 1/2024', DATE '2024-04-15', DATE '2024-04-15', 'Hiến máu cứu người tại Nhà điều hành ĐHQG-HCM.', 1000, 10000000, 'DaKetThuc', v_tk_dieuhanh(8), 4) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Chá»§ Nháº­t Xanh Ä‘á»£t 1 - XÃ¢y dá»±ng KhÃ´ng gian xanh', 'Noi dung phat dong...', v_tk_dieuhanh(7));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('NgÃ y há»™i Hiáº¿n MÃ¡u TÃ¬nh Nguyá»‡n Ä‘á»£t 1/2024', DATE '2024-04-15', DATE '2024-04-15', 'Hiáº¿n mÃ¡u cá»©u ngÆ°á»i táº¡i NhÃ  Ä‘iá»u hÃ nh ÄHQG-HCM.', 1000, 10000000, 'DaKetThuc', v_tk_dieuhanh(8), 4) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(8) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(8), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-04-15');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(15) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(16) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Ngày hội Hiến Máu Tình Nguyện đợt 1/2024', 'Noi dung phat dong...', v_tk_dieuhanh(8));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Chiến dịch Tình nguyện Kỳ Nghỉ Hồng 2024', DATE '2024-08-15', DATE '2024-09-15', 'Chiến dịch dành cho cán bộ viên chức trẻ hỗ trợ chuyên môn cho địa phương.', 50, 30000000, 'DaKetThuc', v_tk_dieuhanh(9), 20) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong NgÃ y há»™i Hiáº¿n MÃ¡u TÃ¬nh Nguyá»‡n Ä‘á»£t 1/2024', 'Noi dung phat dong...', v_tk_dieuhanh(8));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Chiáº¿n dá»‹ch TÃ¬nh nguyá»‡n Ká»³ Nghá»‰ Há»“ng 2024', DATE '2024-08-15', DATE '2024-09-15', 'Chiáº¿n dá»‹ch dÃ nh cho cÃ¡n bá»™ viÃªn chá»©c tráº» há»— trá»£ chuyÃªn mÃ´n cho Ä‘á»‹a phÆ°Æ¡ng.', 50, 30000000, 'DaKetThuc', v_tk_dieuhanh(9), 20) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(9) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(9), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-08-15');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(17) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(18) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Chiến dịch Tình nguyện Kỳ Nghỉ Hồng 2024', 'Noi dung phat dong...', v_tk_dieuhanh(9));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Lò luyện thi Đại học Miễn Phí 2024', DATE '2024-03-01', DATE '2024-06-30', 'Sinh viên xuất sắc tham gia dạy kèm miễn phí cho học sinh hoàn cảnh khó khăn.', 150, 10000000, 'DaKetThuc', v_tk_dieuhanh(10), 100) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Chiáº¿n dá»‹ch TÃ¬nh nguyá»‡n Ká»³ Nghá»‰ Há»“ng 2024', 'Noi dung phat dong...', v_tk_dieuhanh(9));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('LÃ² luyá»‡n thi Äáº¡i há»c Miá»…n PhÃ­ 2024', DATE '2024-03-01', DATE '2024-06-30', 'Sinh viÃªn xuáº¥t sáº¯c tham gia dáº¡y kÃ¨m miá»…n phÃ­ cho há»c sinh hoÃ n cáº£nh khÃ³ khÄƒn.', 150, 10000000, 'DaKetThuc', v_tk_dieuhanh(10), 100) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(10) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(10), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-03-01');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(19) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(20) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Lò luyện thi Đại học Miễn Phí 2024', 'Noi dung phat dong...', v_tk_dieuhanh(10));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Vui Tết Trung Thu 2024 - Nụ cười trẻ thơ', DATE '2024-09-15', DATE '2024-09-17', 'Tổ chức rước đèn, phát quà cho trẻ em có hoàn cảnh khó khăn tại Bình Dương.', 100, 25000000, 'DaKetThuc', v_tk_dieuhanh(11), 8) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong LÃ² luyá»‡n thi Äáº¡i há»c Miá»…n PhÃ­ 2024', 'Noi dung phat dong...', v_tk_dieuhanh(10));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Vui Táº¿t Trung Thu 2024 - Ná»¥ cÆ°á»i tráº» thÆ¡', DATE '2024-09-15', DATE '2024-09-17', 'Tá»• chá»©c rÆ°á»›c Ä‘Ã¨n, phÃ¡t quÃ  cho tráº» em cÃ³ hoÃ n cáº£nh khÃ³ khÄƒn táº¡i BÃ¬nh DÆ°Æ¡ng.', 100, 25000000, 'DaKetThuc', v_tk_dieuhanh(11), 8) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(11) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(11), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-09-15');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(21) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(22) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Vui Tết Trung Thu 2024 - Nụ cười trẻ thơ', 'Noi dung phat dong...', v_tk_dieuhanh(11));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Áo ấm mùa đông - Sưởi ấm vùng cao', DATE '2024-11-01', DATE '2024-12-15', 'Quyên góp quần áo ấm và nhu yếu phẩm gửi tặng đồng bào vùng cao Hà Giang.', 80, 50000000, 'DaKetThuc', v_tk_dieuhanh(12), 20) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Vui Táº¿t Trung Thu 2024 - Ná»¥ cÆ°á»i tráº» thÆ¡', 'Noi dung phat dong...', v_tk_dieuhanh(11));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Ão áº¥m mÃ¹a Ä‘Ã´ng - SÆ°á»Ÿi áº¥m vÃ¹ng cao', DATE '2024-11-01', DATE '2024-12-15', 'QuyÃªn gÃ³p quáº§n Ã¡o áº¥m vÃ  nhu yáº¿u pháº©m gá»­i táº·ng Ä‘á»“ng bÃ o vÃ¹ng cao HÃ  Giang.', 80, 50000000, 'DaKetThuc', v_tk_dieuhanh(12), 20) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(12) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(12), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-11-01');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(23) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(24) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Áo ấm mùa đông - Sưởi ấm vùng cao', 'Noi dung phat dong...', v_tk_dieuhanh(12));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Đổi Rác Lấy Quà - Vì môi trường xanh 2024', DATE '2024-10-10', DATE '2024-10-12', 'Thu gom giấy báo, chai nhựa đổi lấy sen đá và túi vải thân thiện môi trường.', 120, 8000000, 'DaKetThuc', v_tk_dieuhanh(13), 6) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Ão áº¥m mÃ¹a Ä‘Ã´ng - SÆ°á»Ÿi áº¥m vÃ¹ng cao', 'Noi dung phat dong...', v_tk_dieuhanh(12));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Äá»•i RÃ¡c Láº¥y QuÃ  - VÃ¬ mÃ´i trÆ°á»ng xanh 2024', DATE '2024-10-10', DATE '2024-10-12', 'Thu gom giáº¥y bÃ¡o, chai nhá»±a Ä‘á»•i láº¥y sen Ä‘Ã¡ vÃ  tÃºi váº£i thÃ¢n thiá»‡n mÃ´i trÆ°á»ng.', 120, 8000000, 'DaKetThuc', v_tk_dieuhanh(13), 6) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(13) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(13), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-10-10');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(25) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(26) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Đổi Rác Lấy Quà - Vì môi trường xanh 2024', 'Noi dung phat dong...', v_tk_dieuhanh(13));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Tình Nguyện Quốc Tế - Giao lưu ASEAN', DATE '2024-12-01', DATE '2024-12-10', 'Giao lưu văn hóa và thực hiện dự án môi trường cùng sinh viên các nước ASEAN.', 40, 100000000, 'DaKetThuc', v_tk_dieuhanh(14), 40) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Äá»•i RÃ¡c Láº¥y QuÃ  - VÃ¬ mÃ´i trÆ°á»ng xanh 2024', 'Noi dung phat dong...', v_tk_dieuhanh(13));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('TÃ¬nh Nguyá»‡n Quá»‘c Táº¿ - Giao lÆ°u ASEAN', DATE '2024-12-01', DATE '2024-12-10', 'Giao lÆ°u vÄƒn hÃ³a vÃ  thá»±c hiá»‡n dá»± Ã¡n mÃ´i trÆ°á»ng cÃ¹ng sinh viÃªn cÃ¡c nÆ°á»›c ASEAN.', 40, 100000000, 'DaKetThuc', v_tk_dieuhanh(14), 40) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(14) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(14), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-12-01');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(27) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(28) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Tình Nguyện Quốc Tế - Giao lưu ASEAN', 'Noi dung phat dong...', v_tk_dieuhanh(14));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Hỗ trợ chuyển đổi số cho người dân', DATE '2024-05-01', DATE '2024-05-30', 'Sinh viên khối CNTT hướng dẫn người dân sử dụng dịch vụ công trực tuyến.', 200, 10000000, 'DaKetThuc', v_tk_dieuhanh(15), 25) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong TÃ¬nh Nguyá»‡n Quá»‘c Táº¿ - Giao lÆ°u ASEAN', 'Noi dung phat dong...', v_tk_dieuhanh(14));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Há»— trá»£ chuyá»ƒn Ä‘á»•i sá»‘ cho ngÆ°á»i dÃ¢n', DATE '2024-05-01', DATE '2024-05-30', 'Sinh viÃªn khá»‘i CNTT hÆ°á»›ng dáº«n ngÆ°á»i dÃ¢n sá»­ dá»¥ng dá»‹ch vá»¥ cÃ´ng trá»±c tuyáº¿n.', 200, 10000000, 'DaKetThuc', v_tk_dieuhanh(15), 25) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(15) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(15), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-05-01');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(29) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(30) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Hỗ trợ chuyển đổi số cho người dân', 'Noi dung phat dong...', v_tk_dieuhanh(15));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Khắc phục hậu quả bão lũ miền Trung', DATE '2024-10-20', DATE '2024-11-20', 'Huy động nguồn lực và nhân lực hỗ trợ đồng bào miền Trung bị ảnh hưởng bão.', 300, 500000000, 'DaKetThuc', v_tk_dieuhanh(16), 50) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Há»— trá»£ chuyá»ƒn Ä‘á»•i sá»‘ cho ngÆ°á»i dÃ¢n', 'Noi dung phat dong...', v_tk_dieuhanh(15));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Kháº¯c phá»¥c háº­u quáº£ bÃ£o lÅ© miá»n Trung', DATE '2024-10-20', DATE '2024-11-20', 'Huy Ä‘á»™ng nguá»“n lá»±c vÃ  nhÃ¢n lá»±c há»— trá»£ Ä‘á»“ng bÃ o miá»n Trung bá»‹ áº£nh hÆ°á»Ÿng bÃ£o.', 300, 500000000, 'DaKetThuc', v_tk_dieuhanh(16), 50) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(16) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(16), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(1), 'DaDuyet', DATE '2024-10-20');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(31) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(32) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Khắc phục hậu quả bão lũ miền Trung', 'Noi dung phat dong...', v_tk_dieuhanh(16));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Xây cầu giao thông nông thôn tại Đồng Tháp', DATE '2024-02-01', DATE '2024-03-01', 'Góp sức trẻ xây cầu bêtông thay thế cầu khỉ tại huyện Lai Vung.', 60, 250000000, 'DaKetThuc', v_tk_dieuhanh(17), 60) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Kháº¯c phá»¥c háº­u quáº£ bÃ£o lÅ© miá»n Trung', 'Noi dung phat dong...', v_tk_dieuhanh(16));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('XÃ¢y cáº§u giao thÃ´ng nÃ´ng thÃ´n táº¡i Äá»“ng ThÃ¡p', DATE '2024-02-01', DATE '2024-03-01', 'GÃ³p sá»©c tráº» xÃ¢y cáº§u bÃªtÃ´ng thay tháº¿ cáº§u khá»‰ táº¡i huyá»‡n Lai Vung.', 60, 250000000, 'DaKetThuc', v_tk_dieuhanh(17), 60) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(17) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(17), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2024-02-01');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(33) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(34) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Xây cầu giao thông nông thôn tại Đồng Tháp', 'Noi dung phat dong...', v_tk_dieuhanh(17));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Xuân Tình Nguyện 2025 - Kết nối cộng đồng', DATE '2025-01-05', DATE '2025-02-05', 'Tiếp nối tinh thần xung kích chăm lo Tết cho các hoàn cảnh khó khăn.', 200, 30000000, 'DangHoatDong', v_tk_dieuhanh(18), NULL) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong XÃ¢y cáº§u giao thÃ´ng nÃ´ng thÃ´n táº¡i Äá»“ng ThÃ¡p', 'Noi dung phat dong...', v_tk_dieuhanh(17));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('XuÃ¢n TÃ¬nh Nguyá»‡n 2025 - Káº¿t ná»‘i cá»™ng Ä‘á»“ng', DATE '2025-01-05', DATE '2025-02-05', 'Tiáº¿p ná»‘i tinh tháº§n xung kÃ­ch chÄƒm lo Táº¿t cho cÃ¡c hoÃ n cáº£nh khÃ³ khÄƒn.', 200, 30000000, 'DangHoatDong', v_tk_dieuhanh(18), NULL) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(18) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(18), v_tmp);
     INSERT INTO DuyetChienDich(MaChienDich, MaNguoiDuyet, TrangThai, NgayDuyet) VALUES (v_tmp, v_tk_admin(2), 'DaDuyet', DATE '2025-01-05');
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(35) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(36) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Xuân Tình Nguyện 2025 - Kết nối cộng đồng', 'Noi dung phat dong...', v_tk_dieuhanh(18));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Tiếp Sức Mùa Thi 2025 - Đồng hành sĩ tử', DATE '2025-06-25', DATE '2025-07-05', 'Hỗ trợ sĩ tử trong kỳ thi tốt nghiệp THPT 2025.', 800, 25000000, 'ChoDuyet', v_tk_dieuhanh(19), 15) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong XuÃ¢n TÃ¬nh Nguyá»‡n 2025 - Káº¿t ná»‘i cá»™ng Ä‘á»“ng', 'Noi dung phat dong...', v_tk_dieuhanh(18));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Tiáº¿p Sá»©c MÃ¹a Thi 2025 - Äá»“ng hÃ nh sÄ© tá»­', DATE '2025-06-25', DATE '2025-07-05', 'Há»— trá»£ sÄ© tá»­ trong ká»³ thi tá»‘t nghiá»‡p THPT 2025.', 800, 25000000, 'ChoDuyet', v_tk_dieuhanh(19), 15) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(19) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(19), v_tmp);
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(37) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(38) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Tiếp Sức Mùa Thi 2025 - Đồng hành sĩ tử', 'Noi dung phat dong...', v_tk_dieuhanh(19));
-    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('Ngày hội Hiến Máu Tình Nguyện đợt 1/2025', DATE '2025-04-10', DATE '2025-04-10', 'Chung tay vì cộng đồng, hiến giọt máu đào trao đời sự sống.', 1000, 15000000, 'ChoDuyet', v_tk_dieuhanh(20), 4) RETURNING MaChienDich INTO v_tmp;
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Tiáº¿p Sá»©c MÃ¹a Thi 2025 - Äá»“ng hÃ nh sÄ© tá»­', 'Noi dung phat dong...', v_tk_dieuhanh(19));
+    INSERT INTO ChienDich(TenChienDich, NgayBatDau, NgayKetThuc, MoTa, SoLuongTNVToiDa, MucTieuTien, TrangThai, MaNguoiTao, GioToiThieuCN) VALUES ('NgÃ y há»™i Hiáº¿n MÃ¡u TÃ¬nh Nguyá»‡n Ä‘á»£t 1/2025', DATE '2025-04-10', DATE '2025-04-10', 'Chung tay vÃ¬ cá»™ng Ä‘á»“ng, hiáº¿n giá»t mÃ¡u Ä‘Ã o trao Ä‘á»i sá»± sá»‘ng.', 1000, 15000000, 'ChoDuyet', v_tk_dieuhanh(20), 4) RETURNING MaChienDich INTO v_tmp;
     v_cd_ids(20) := v_tmp;
     INSERT INTO BanDieuHanh(MaTaiKhoan, MaChienDich) VALUES (v_tk_dieuhanh(20), v_tmp);
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban truyen thong', 20, 10) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban truyen thong', 20) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(39) := v_tmp2;
-    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan, GioQuyDinh) VALUES (v_tmp, 'Ban hau can', 30, 20) RETURNING MaCongViec INTO v_tmp2;
+    INSERT INTO CongViec(MaChienDich, TenCongViec, SoLuongTNVCan) VALUES (v_tmp, 'Ban hau can', 30) RETURNING MaCongViec INTO v_tmp2;
     v_cv_ids(40) := v_tmp2;
-    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong Ngày hội Hiến Máu Tình Nguyện đợt 1/2025', 'Noi dung phat dong...', v_tk_dieuhanh(20));
+    INSERT INTO TinTuc(MaChienDich, TieuDe, NoiDung, MaNguoiDang) VALUES (v_tmp, 'Phat dong NgÃ y há»™i Hiáº¿n MÃ¡u TÃ¬nh Nguyá»‡n Ä‘á»£t 1/2025', 'Noi dung phat dong...', v_tk_dieuhanh(20));
 
     -- 7. THAM GIA TNV & PHAN CONG & DIEM DANH
     INSERT INTO ThamGiaTNV(MaTaiKhoan, MaChienDich, TrangThaiDuyet) VALUES (v_tk_tnv(39), v_cd_ids(1), 'HoanThanh') RETURNING MaThamGia INTO v_tmp;
@@ -3206,9 +3202,13 @@ BEGIN
     SP_NHAPKHO_VATPHAM(v_cd_ids(3), v_loai_ids(2), 200);
     SP_XUATKHO_VATPHAM(v_cd_ids(3), v_loai_ids(1), 50, 'Sinh Vien A');
 
+    -- Enable lai cac triggers nghiep vu
+    EXECUTE IMMEDIATE 'ALTER TRIGGER TRG_KIEMTRA_THOIGIAN ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER TRG_KIEMTRA_TRUNG_LICH ENABLE';
+    EXECUTE IMMEDIATE 'ALTER TRIGGER TRG_KIEMTRA_SOLUONG_DANGKY ENABLE';
+    DBMS_OUTPUT.PUT_LINE('>> Da enable lai triggers nghiep vu.');
+
     COMMIT;
     DBMS_OUTPUT.PUT_LINE('Tao Seed Data thanh cong voi 3 vai tro: BanQuanLy, BanDieuHanh, TinhNguyenVien!');
 END;
 /
-
-

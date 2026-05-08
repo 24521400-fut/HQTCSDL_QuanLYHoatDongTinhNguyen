@@ -325,7 +325,7 @@ AS
     v_MaPhieu VARCHAR2(10);
 BEGIN
     INSERT INTO PhieuQuyenGopVP(MaPhieuQG, MaTaiKhoan, MaChienDich, NguoiNhan)
-    VALUES (NULL, 1, p_MaCD, 'Admin')
+    VALUES (NULL, (SELECT MIN(MaTaiKhoan) FROM TaiKhoan WHERE VaiTro = 'BanQuanLy'), p_MaCD, 'Admin')
     RETURNING MaPhieuQG INTO v_MaPhieu;
     
     INSERT INTO ChiTietQuyenGopVP(MaPhieuQG, MaLoai, SoLuong)
@@ -481,13 +481,3 @@ BEGIN
 END;
 /
 
--- 33. SP_XOA_CHIENDICH
-CREATE OR REPLACE PROCEDURE SP_XOA_CHIENDICH (
-    p_MaCD IN VARCHAR2
-)
-AS
-BEGIN
-    -- Tat ca reference (BanDieuHanh, PhanCong, ...) se tu dong xoa nho ON DELETE CASCADE
-    DELETE FROM ChienDich WHERE MaChienDich = p_MaCD;
-END;
-/
