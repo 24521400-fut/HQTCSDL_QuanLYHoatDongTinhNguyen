@@ -26,16 +26,72 @@
 
 .thongbao-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: 5px;
+  right: 5px;
   background-color: #ef4444;
-  color: white;
-  font-size: 0.7rem;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 10px;
-  border: 2px solid var(--color-background);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid white;
 }
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  padding: 4px;
+}
+
+.icon-btn:hover {
+  opacity: 1;
+}
+
+.thongbao-item-content {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.noti-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  background: #f3f4f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.noti-text-wrapper {
+  flex: 1;
+}
+
+.thongbao-meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+}
+
+.view-link {
+  font-size: 0.75rem;
+  color: #2196F3;
+  font-weight: 600;
+}
+
+.view-link:hover {
+  text-decoration: underline;
+}
+
 
 .thongbao-dropdown {
   position: absolute;

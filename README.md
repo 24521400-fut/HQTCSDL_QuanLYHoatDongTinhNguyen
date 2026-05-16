@@ -142,36 +142,56 @@ Oracle Database là hệ quản trị cơ sở dữ liệu mà toàn bộ dữ l
 
 3. Thoát khỏi session SYSDBA:
    ```sql
-   EXIT;
-   ```
+---
 
-4. Kết nối lại với user `hqtcsdldb` vừa tạo:
-   ```
-   sqlplus hqtcsdldb/hqtcsdl123@localhost:1521/orcl
-   ```
+### Bước 4: Cài đặt thư viện (Dependencies) 📦
 
-5. Nạp các file SQL của dự án theo đúng thứ tự (giả sử bạn đã clone dự án ở Bước 5 vào thư mục `C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen`). Chạy từng lệnh một:
+Mở CMD/Terminal tại thư mục gốc của dự án và chạy lệnh:
+```bash
+npm install
+```
+*Lưu ý: Bước này sẽ tự động cài đặt tất cả các thư viện cần thiết cho cả Frontend và Backend.*
+
+---
+
+### Bước 5: Nạp Cơ sở dữ liệu (Oracle Database) 🗄️
+
+Đảm bảo bạn đang ở trong thư mục dự án. Mở CMD và gõ:
+```sql
+sqlplus sys as sysdba
+```
+(Sau đó nhập mật khẩu hệ thống của bạn).
+
+Khi đã vào SQL*Plus, hãy chạy lần lượt các lệnh sau (Đảm bảo đường dẫn đúng đến thư mục `database` của dự án):
+
+1. Tạo User và cấp quyền (Nếu chưa có):
    ```sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\01_sequences.sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\02_tables.sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\03_indexes.sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\04_triggers_auto_pk.sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\05_triggers_business.sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\06_stored_procedures.sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\07_stored_functions.sql
+   CREATE USER hqtcsdldb IDENTIFIED BY hqtcsdl123;
+   GRANT CONNECT, RESOURCE, DBA TO hqtcsdldb;
+   CONNECT hqtcsdldb/hqtcsdl123;
    ```
+
+2. Nạp các thành phần theo thứ tự (Sử dụng đường dẫn tương đối):
+   ```sql
+   @./database/01_sequences.sql
+   @./database/02_tables.sql
+   @./database/03_indexes.sql
+   @./database/04_triggers_auto_pk.sql
+   @./database/05_triggers_business.sql
+   @./database/06_stored_procedures.sql
+   @./database/07_stored_functions.sql
+   @./database/08_SeedData.sql
+   ```
+
+3. Biên dịch lại thủ tục (Nếu cần):
    ```sql
    ALTER PROCEDURE SP_CAP_CHUNGNHAN_CD COMPILE;
-   ```
-   ```sql
-   @C:\Projects\HQTCSDL_QuanLYHoatDongTinhNguyen\database\08_SeedData.sql
    ```
 
 6. Kiểm tra kết quả nạp dữ liệu:
    ```sql
    SELECT object_name, object_type, status FROM user_objects WHERE status = 'INVALID';
    ```
-   Nếu kết quả trả về **"no rows selected"**, tất cả đã nạp thành công, không có lỗi.
 
 7. Thoát SQL*Plus:
    ```sql

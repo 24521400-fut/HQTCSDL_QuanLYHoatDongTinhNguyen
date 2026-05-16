@@ -24,12 +24,12 @@ router.post('/donate', async (req, res) => {
 
 router.post('/expense', async (req, res) => {
   try {
-    const { maCD, tenKhoanChi, soTien, mucDich, maNguoiChi } = req.body;
-    if (!maCD || !soTien || !mucDich) {
-      return res.status(400).json({ error: 'Thiếu thông tin yêu cầu.' });
+    const { maCD, tenKhoanChi, soTien, mucDich, maNguoiChi, hinhAnhUrl } = req.body;
+    if (!maCD || !soTien || !mucDich || !hinhAnhUrl) {
+      return res.status(400).json({ error: 'Thiếu thông tin yêu cầu hoặc minh chứng hình ảnh.' });
     }
     
-    await requestExpense(maCD, tenKhoanChi, soTien, mucDich, maNguoiChi);
+    await requestExpense(maCD, tenKhoanChi, soTien, mucDich, maNguoiChi, hinhAnhUrl);
     res.json({ success: true, message: 'Đã tạo khoản chi thành công.' });
   } catch (error) {
     let errorMessage = error.message;

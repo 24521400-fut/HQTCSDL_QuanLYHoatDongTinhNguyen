@@ -1,5 +1,12 @@
 import express from 'express';
-import { getCampaignEfficiency, getTopContributors, getParameters, updateParameter } from '../services/statisticsService.js';
+import { 
+  getCampaignEfficiency, 
+  getTopContributors, 
+  getParameters, 
+  updateParameter,
+  getCampaignStats,
+  getCampaignTopVolunteers
+} from '../services/statisticsService.js';
 
 const router = express.Router();
 
@@ -8,6 +15,24 @@ router.get('/campaign/:id/efficiency', async (req, res) => {
     const { id } = req.params;
     const efficiency = await getCampaignEfficiency(id);
     res.json(efficiency);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/campaign/:id/stats', async (req, res) => {
+  try {
+    const stats = await getCampaignStats(req.params.id);
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/campaign/:id/top-volunteers', async (req, res) => {
+  try {
+    const top = await getCampaignTopVolunteers(req.params.id);
+    res.json(top);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

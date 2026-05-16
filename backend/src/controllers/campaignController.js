@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllCampaigns, createCampaign, enrollCampaign, getMyEnrollments } from '../services/campaignService.js';
+import { getAllCampaigns, createCampaign, enrollCampaign, getMyEnrollments, getManagedCampaign } from '../services/campaignService.js';
 
 const router = express.Router();
 
@@ -45,6 +45,16 @@ router.get('/my-enrollments/:maTK', async (req, res) => {
     const { maTK } = req.params;
     const enrollments = await getMyEnrollments(maTK);
     res.json(enrollments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/managed/:maTK', async (req, res) => {
+  try {
+    const { maTK } = req.params;
+    const campaigns = await getManagedCampaign(maTK);
+    res.json(campaigns);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

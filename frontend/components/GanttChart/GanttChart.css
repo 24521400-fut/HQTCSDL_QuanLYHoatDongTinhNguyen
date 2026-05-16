@@ -1,0 +1,110 @@
+/* ============================================================
+   GanttChart.css - Biểu đồ Gantt cho lịch điều phối tổng thể
+   Thiết kế Solid White Panel
+   ============================================================ */
+
+.gantt-wrapper {
+  width: 100%;
+}
+
+.gantt-container {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.gantt-header {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+  position: relative;
+  font-weight: 600;
+}
+
+.gantt-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 44px;
+  border-bottom: 1px dashed #f3f4f6;
+}
+
+.gantt-task-name {
+  width: 200px;
+  min-width: 200px;
+  font-weight: 600;
+  padding-right: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  left: 0;
+  background-color: white;
+  z-index: 2;
+  color: #0D1B2A;
+}
+
+.gantt-timeline {
+  flex-grow: 1;
+  position: relative;
+  height: 100%;
+  min-width: 600px;
+}
+
+.gantt-bar {
+  position: absolute;
+  height: 28px;
+  top: 8px;
+  background: linear-gradient(90deg, #F58220 0%, #FF9A44 100%);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(245, 130, 32, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 4px;
+}
+
+.gantt-bar:hover {
+  transform: scaleY(1.15);
+  box-shadow: 0 4px 12px rgba(245, 130, 32, 0.4);
+}
+
+.gantt-bar-tooltip {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0D1B2A;
+  color: #FFF;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  display: none;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gantt-bar:hover .gantt-bar-tooltip {
+  display: block;
+}
+
+.add-task-btn {
+  background: rgba(245, 130, 32, 0.1);
+  color: #F58220;
+  border: 2px dashed #F58220;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.add-task-btn:hover {
+  background: #F58220;
+  color: #FFF;
+  box-shadow: 0 4px 12px rgba(245, 130, 32, 0.3);
+}

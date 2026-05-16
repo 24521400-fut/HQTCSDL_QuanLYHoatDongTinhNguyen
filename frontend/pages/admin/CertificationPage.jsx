@@ -3,7 +3,7 @@ import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/common/GlassCard";
 import SystemModal from "../../components/common/SystemModal";
 import { getCampaigns } from "../../services/campaigns";
-import { issueCertificates, getEligibleVolunteers, getCertificatesByCampaign } from "../../services/certification";
+import { issueCertificates, issueSingleCertificate, getEligibleVolunteers, getCertificatesByCampaign } from "../../services/certification";
 import { useAuth } from "../../context/AuthContext";
 import "./CertificationPage.css";
 
@@ -17,6 +17,9 @@ const CertificationPage = () => {
   const [modal, setModal] = useState({ isOpen: false, title: "", message: "", type: "error" });
   
   const [previewCert, setPreviewCert] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, volunteer: null });
+  const [confirmBulk, setConfirmBulk] = useState(false);
+  const [issuingId, setIssuingId] = useState(null);
 
   useEffect(() => {
     fetchCampaigns();
@@ -54,10 +57,29 @@ const CertificationPage = () => {
     }
   };
 
-  const handleIssue = async () => {
+  const handleIssueSingle = async () => {
+    const v = confirmModal.volunteer;
+    if (!v) return;
+    
+    const maThamGia = v.MATHAMGIA || v.MaThamGia;
+    setIssuingId(maThamGia);
     try {
+      await issueSingleCertificate(maThamGia);
+      setModal({ isOpen: true, title: "Thành công", message: `Đã cấp chứng nhận cho ${v.HOTEN || v.HoTen}.`, type: "success" });
+      setConfirmModal({ isOpen: false, volunteer: null });
+      fetchData(selectedCampaign);
+    } catch (error) {
+      setModal({ isOpen: true, title: "Lỗi", message: error.message, type: "error" });
+    } finally {
+      setIssuingId(null);
+    }
+  };
+
+  const handleIssueBulk = async () => {
+    try {
+      setConfirmBulk(false);
       await issueCertificates(selectedCampaign);
-      setModal({ isOpen: true, title: "Thành công", message: "Đã cấp chứng nhận hàng loạt cho TNV đủ điều kiện.", type: "success" });
+      setModal({ isOpen: true, title: "Thành công", message: `Đã cấp chứng nhận hàng loạt cho ${volunteers.length} TNV đủ điều kiện.`, type: "success" });
       fetchData(selectedCampaign);
     } catch (error) {
       setModal({ isOpen: true, title: "Lỗi", message: error.message, type: "error" });
@@ -68,35 +90,118 @@ const CertificationPage = () => {
     setPreviewCert(cert);
   };
 
+  const getCampaignName = () => {
+    const campaign = campaigns.find(c => (c.MaChienDich || c.MACHIENDICH) === selectedCampaign);
+    return campaign ? (campaign.TenChienDich || campaign.TENCHIENDICH) : '';
+  };
+
+  const formatHours = (hours) => {
+    if (!hours && hours !== 0) return '0h';
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}p`;
+  };
+
+  const getBadgeName = (xepLoai) => {
+    if (!xepLoai) return "Chưa có";
+    switch(xepLoai.toLowerCase()) {
+      case 'xuatsac': return 'Xuất Sắc';
+      case 'tot': return 'Tốt';
+      case 'kha': return 'Khá';
+      case 'trungbinh': return 'Trung Bình';
+      default: return xepLoai;
+    }
+  };
+
+  const getBadgeClass = (xepLoai) => {
+    if (!xepLoai) return 'xl-trungbinh';
+    switch(xepLoai.toLowerCase()) {
+      case 'xuatsac': return 'xl-xuatsac';
+      case 'tot': return 'xl-tot';
+      case 'kha': return 'xl-kha';
+      default: return 'xl-trungbinh';
+    }
+  };
+
   return (
     <MainLayout>
       <SystemModal isOpen={modal.isOpen} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({ ...modal, isOpen: false })} />
       
+      {confirmModal.isOpen && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal glassmorphism">
+            <h2>Xác nhận Cấp chứng nhận</h2>
+            <p>Bạn có chắc chắn muốn cấp chứng nhận cho:</p>
+            <div className="confirm-info-block">
+              <div className="confirm-name">{confirmModal.volunteer.HOTEN || confirmModal.volunteer.HoTen}</div>
+              <div className="confirm-detail">
+                MSSV: {confirmModal.volunteer.MSSV || confirmModal.volunteer.MASOSINHVIEN || '---'}
+              </div>
+              <div className="confirm-detail">
+                Tổng giờ tích lũy: <strong>{formatHours(confirmModal.volunteer.TONGGIO || confirmModal.volunteer.TongGio)}</strong>
+              </div>
+              <div className="confirm-detail">
+                Xếp loại: <span className={`xep-loai-badge ${getBadgeClass(confirmModal.volunteer.XEPLOAI || confirmModal.volunteer.XepLoai)}`}>
+                  {getBadgeName(confirmModal.volunteer.XEPLOAI || confirmModal.volunteer.XepLoai)}
+                </span>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button onClick={() => setConfirmModal({isOpen: false, volunteer: null})} className="cancel-btn">Hủy</button>
+              <button onClick={handleIssueSingle} className="approve-btn-final" disabled={issuingId}>
+                {issuingId ? 'Đang xử lý...' : 'Xác Nhận Cấp'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmBulk && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal glassmorphism">
+            <h2>Xác nhận Cấp hàng loạt</h2>
+            <p>Bạn sẽ cấp chứng nhận cho <strong>{volunteers.length}</strong> TNV trong danh sách.</p>
+            <div className="modal-actions">
+              <button onClick={() => setConfirmBulk(false)} className="cancel-btn">Hủy</button>
+              <button onClick={handleIssueBulk} className="approve-btn-final">Xác Nhận Cấp Tất Cả</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {previewCert && (
         <div className="custom-modal-overlay" onClick={() => setPreviewCert(null)}>
           <div className="certificate-modal" onClick={e => e.stopPropagation()}>
-            <div className="cert-header">
-              <h2>GIẤY CHỨNG NHẬN</h2>
-              <p>HOẠT ĐỘNG TÌNH NGUYỆN</p>
-            </div>
-            <div className="cert-body">
-              <p>Chứng nhận sinh viên:</p>
-              <h3>{previewCert.HOTEN || previewCert.HoTen}</h3>
-              <p>MSSV: {previewCert.MASOSINHVIEN || previewCert.MaSoSinhVien}</p>
-              <br/>
-              <p>Đã tham gia tích cực chiến dịch và đạt xếp loại:</p>
-              <h2 className="cert-rating">{previewCert.XEPLOAI || previewCert.XepLoai}</h2>
-            </div>
-            <div className="cert-footer">
-              <div className="qr-placeholder">
-                Mã xác thực: {previewCert.MACHUNGNHAN || previewCert.MaChungNhan}
+            <div className="cert-border-decor">
+              <div className="cert-header">
+                <div className="cert-logos">
+                  <span className="logo-dt">HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG TÌNH NGUYỆN</span>
+                </div>
+                <h2>GIẤY CHỨNG NHẬN</h2>
+                <p className="cert-subtitle">ELECTRONIC CERTIFICATE</p>
               </div>
-              <div className="signature">
-                <p>Ngày cấp: {new Date(previewCert.NGAYCAP || previewCert.NgayCap).toLocaleDateString('vi-VN')}</p>
-                <p><strong>Ban Quản Lý</strong></p>
+              <div className="cert-body">
+                <p>Ban Quản Lý hoạt động Tình nguyện chứng nhận sinh viên:</p>
+                <h3 className="student-name">{previewCert.HOTEN || previewCert.HoTen}</h3>
+                <p className="student-info">MSSV: {previewCert.MSSV || previewCert.MASOSINHVIEN}</p>
+                <div className="cert-main-text">
+                  Đã tham gia tích cực và đóng góp <strong>{formatHours(previewCert.TONGGIO || previewCert.TongGio)}</strong> hoạt động trong chương trình:
+                  <div className="campaign-name">"{previewCert.TENCHIENDICH || previewCert.TenChienDich || getCampaignName()}"</div>
+                  đạt xếp loại:
+                </div>
+                <h2 className="cert-rating">{getBadgeName(previewCert.XEPLOAI || previewCert.XepLoai)}</h2>
+              </div>
+              <div className="cert-footer">
+                <div className="cert-id">Mã xác thực: {previewCert.MACHUNGNHAN || previewCert.MaChungNhan}</div>
+                <div className="cert-sig">
+                  <p>Ngày cấp: {new Date(previewCert.NGAYCAP || previewCert.NgayCap).toLocaleDateString('vi-VN')}</p>
+                  <p><strong>BAN QUẢN LÝ</strong></p>
+                  <div className="signature-placeholder">(Đã ký)</div>
+                </div>
               </div>
             </div>
-            <button className="close-cert-btn" onClick={() => setPreviewCert(null)}>Đóng</button>
+            <button className="close-cert-btn" onClick={() => setPreviewCert(null)}>✕</button>
           </div>
         </div>
       )}
@@ -113,9 +218,7 @@ const CertificationPage = () => {
                 </option>
               ))}
             </select>
-            <button className="action-btn eval-btn" onClick={handleIssue}>
-              Cấp Hàng Loạt
-            </button>
+            <button className="action-btn eval-btn bulk-btn" onClick={() => volunteers.length > 0 && setConfirmBulk(true)}>Cấp Hàng Loạt</button>
           </div>
         </div>
 
@@ -125,22 +228,31 @@ const CertificationPage = () => {
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>TNV</th>
-                    <th>Tổng Giờ</th>
-                    <th>Xếp Loại Dự Kiến</th>
+                    <th>MSSV</th>
+                    <th>Họ Tên</th>
+                    <th className="text-center">Tổng Giờ</th>
+                    <th className="text-center">Xếp Loại</th>
+                    <th className="text-center">Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody>
                   {volunteers.map(v => (
-                    <tr key={v.MATHAMGIA || v.MaThamGia}>
-                      <td>{v.HOTEN || v.HoTen}</td>
-                      <td>{v.TONGGIO || v.TongGio}</td>
-                      <td>{v.XEPLOAI || v.XepLoai}</td>
+                    <tr key={v.MATHAMGIA || v.MaThamGia} className="cert-row-animate">
+                      <td><span className="mssv-tag">{v.MSSV || v.MASOSINHVIEN || '---'}</span></td>
+                      <td><div className="tnv-name-cell">{v.HOTEN || v.HoTen}</div></td>
+                      <td className="text-center">
+                        <span className="hour-badge-dynamic">{formatHours(v.TONGGIO || v.TongGio)}</span>
+                      </td>
+                      <td className="text-center">
+                        <span className={`xep-loai-badge ${getBadgeClass(v.XEPLOAI || v.XepLoai)}`}>
+                          {getBadgeName(v.XEPLOAI || v.XepLoai)}
+                        </span>
+                      </td>
+                      <td className="text-center">
+                        <button className="btn-cap-cn" onClick={() => setConfirmModal({ isOpen: true, volunteer: v })}>Cấp CN</button>
+                      </td>
                     </tr>
                   ))}
-                  {volunteers.length === 0 && !loading && (
-                    <tr><td colSpan="3" className="empty-state">Không có sinh viên nào.</td></tr>
-                  )}
                 </tbody>
               </table>
              </div>
@@ -151,24 +263,31 @@ const CertificationPage = () => {
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>TNV</th>
-                    <th>Xếp Loại</th>
-                    <th>Thao Tác</th>
+                    <th>MSSV</th>
+                    <th>Họ Tên</th>
+                    <th className="text-center">Tổng Giờ</th>
+                    <th className="text-center">Xếp Loại</th>
+                    <th className="text-center">Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody>
                   {certificates.map(c => (
-                    <tr key={c.MACHUNGNHAN || c.MaChungNhan}>
-                      <td>{c.HOTEN || c.HoTen}</td>
-                      <td>{c.XEPLOAI || c.XepLoai}</td>
-                      <td>
-                        <button className="action-btn view-btn" onClick={() => handlePreview(c)}>Xem PDF</button>
+                    <tr key={c.MACHUNGNHAN || c.MaChungNhan} className="cert-issued-row">
+                      <td><span className="mssv-tag">{c.MSSV || c.MASOSINHVIEN || '---'}</span></td>
+                      <td><div className="tnv-name-cell">{c.HOTEN || c.HoTen}</div></td>
+                      <td className="text-center">
+                        <span className="hour-badge-dynamic">{formatHours(c.TONGGIO || c.TongGio)}</span>
+                      </td>
+                      <td className="text-center">
+                        <span className={`xep-loai-badge ${getBadgeClass(c.XEPLOAI || c.XepLoai)}`}>
+                          {getBadgeName(c.XEPLOAI || c.XepLoai)}
+                        </span>
+                      </td>
+                      <td className="text-center">
+                        <button className="action-btn view-btn" onClick={() => handlePreview(c)}>Xem CN</button>
                       </td>
                     </tr>
                   ))}
-                  {certificates.length === 0 && !loading && (
-                    <tr><td colSpan="3" className="empty-state">Chưa cấp chứng nhận nào.</td></tr>
-                  )}
                 </tbody>
               </table>
              </div>

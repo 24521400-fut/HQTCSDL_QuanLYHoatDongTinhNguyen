@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import MainLayout from "../../components/layout/MainLayout";
 import "./ThongBaoList.css";
 
 const ThongBaoList = () => {
@@ -55,7 +56,8 @@ const ThongBaoList = () => {
   if (loading) return <div className="tb-loading">Đang tải thông báo...</div>;
 
   return (
-    <div className="tb-page-container">
+    <MainLayout>
+      <div className="tb-page-container">
       <div className="tb-header">
         <h1>Tất Cả Thông Báo</h1>
       </div>
@@ -86,6 +88,7 @@ const ThongBaoList = () => {
         )}
       </div>
     </div>
+    </MainLayout>
   );
 };
 

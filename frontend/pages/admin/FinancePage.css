@@ -87,3 +87,31 @@
   color: #B0BEC5;
   font-style: italic;
 }
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.campaign-selector select {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: white;
+  color: #0D1B2A;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.current-campaign-badge {
+  background: rgba(245, 130, 32, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #F58220;
+  color: #0D1B2A;
+}
+
+.current-campaign-badge strong {
+  color: #F58220;
+}

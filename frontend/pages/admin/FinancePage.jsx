@@ -3,7 +3,7 @@ import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/common/GlassCard";
 import BudgetTracker from "../../components/finance/BudgetTracker";
 import SystemModal from "../../components/common/SystemModal";
-import { getCampaigns } from "../../services/campaigns";
+import { getCampaigns, getManagedCampaigns } from "../../services/campaigns";
 import { 
   getCampaignFinanceSummary, 
   recordDonation, 
@@ -30,7 +30,7 @@ const FinancePage = () => {
   const [donationData, setDonationData] = useState({ maTK: user.MaTaiKhoan, soTien: "", phuongThuc: "ChuyenKhoan" });
   
   // Expense Form
-  const [expenseData, setExpenseData] = useState({ tenKhoanChi: "", soTien: "", mucDich: "" });
+  const [expenseData, setExpenseData] = useState({ tenKhoanChi: "", soTien: "", mucDich: "", hinhAnhUrl: "" });
   
   // Proof Form
   const [proofModal, setProofModal] = useState({ isOpen: false, maChiTieu: "" });
@@ -48,7 +48,12 @@ const FinancePage = () => {
 
   const fetchCampaigns = async () => {
     try {
-      const data = await getCampaigns();
+      let data;
+      if (user.VaiTro === 'BanDieuHanh') {
+        data = await getManagedCampaigns(user.MaTaiKhoan);
+      } else {
+        data = await getCampaigns();
+      }
       setCampaigns(data);
       if (data.length > 0) {
         setSelectedCampaign(data[0].MaChienDich || data[0].MACHIENDICH);
@@ -83,10 +88,14 @@ const FinancePage = () => {
 
   const handleExpense = async (e) => {
     e.preventDefault();
+    if (!expenseData.hinhAnhUrl) {
+      setModal({ isOpen: true, title: "Thiếu minh chứng", message: "Vui lòng cung cấp link hình ảnh minh chứng chi tiêu.", type: "error" });
+      return;
+    }
     try {
-      await requestExpense(selectedCampaign, expenseData.tenKhoanChi, Number(expenseData.soTien), expenseData.mucDich, user.MaTaiKhoan);
-      setModal({ isOpen: true, title: "Thành công", message: "Đã duyệt khoản chi.", type: "success" });
-      setExpenseData({ tenKhoanChi: "", soTien: "", mucDich: "" });
+      await requestExpense(selectedCampaign, expenseData.tenKhoanChi, Number(expenseData.soTien), expenseData.mucDich, user.MaTaiKhoan, expenseData.hinhAnhUrl);
+      setModal({ isOpen: true, title: "Thành công", message: "Đã duyệt khoản chi và lưu minh chứng.", type: "success" });
+      setExpenseData({ tenKhoanChi: "", soTien: "", mucDich: "", hinhAnhUrl: "" });
       fetchFinanceSummary(selectedCampaign);
     } catch (error) {
       setModal({ isOpen: true, title: "Lỗi Ngân Quỹ", message: error.message, type: "error" });
@@ -135,16 +144,23 @@ const FinancePage = () => {
       <div className="finance-page-container">
         <div className="page-header">
           <h1>Tài Chính & Ngân Quỹ</h1>
-          <div className="campaign-selector">
-            <label>Chọn chiến dịch: </label>
-            <select value={selectedCampaign} onChange={(e) => setSelectedCampaign(e.target.value)}>
-              {campaigns.map(c => (
-                <option key={c.MaChienDich || c.MACHIENDICH} value={c.MaChienDich || c.MACHIENDICH}>
-                  {c.TenChienDich || c.TENCHIENDICH}
-                </option>
-              ))}
-            </select>
-          </div>
+          {user.VaiTro === 'BanQuanLy' && (
+            <div className="campaign-selector">
+              <label>Chọn chiến dịch: </label>
+              <select value={selectedCampaign} onChange={(e) => setSelectedCampaign(e.target.value)}>
+                {campaigns.map(c => (
+                  <option key={c.MaChienDich || c.MACHIENDICH} value={c.MaChienDich || c.MACHIENDICH}>
+                    {c.TenChienDich || c.TENCHIENDICH}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {user.VaiTro === 'BanDieuHanh' && campaigns.length > 0 && (
+             <div className="current-campaign-badge">
+                Chiến dịch: <strong>{campaigns[0].TenChienDich || campaigns[0].TENCHIENDICH}</strong>
+             </div>
+          )}
         </div>
 
         {!loading && (
@@ -191,6 +207,10 @@ const FinancePage = () => {
                     <div className="form-group">
                       <label>Mục Đích</label>
                       <input type="text" value={expenseData.mucDich} onChange={e => setExpenseData({...expenseData, mucDich: e.target.value})} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Minh Chứng (Link Hình Ảnh/Hóa Đơn) *</label>
+                      <input type="url" value={expenseData.hinhAnhUrl} onChange={e => setExpenseData({...expenseData, hinhAnhUrl: e.target.value})} required placeholder="https://imgur.com/..." />
                     </div>
                     <button type="submit" className="action-btn danger-btn">Duyệt Chi</button>
                   </form>

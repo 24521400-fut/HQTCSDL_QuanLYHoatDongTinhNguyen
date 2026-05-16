@@ -1,5 +1,5 @@
 import express from 'express';
-import { issueCertificates, getEligibleVolunteers, getCertificatesByCampaign, getMyCertificates } from '../services/certificationService.js';
+import { issueCertificates, issueSingleCertificate, getEligibleVolunteers, getCertificatesByCampaign, getMyCertificates } from '../services/certificationService.js';
 
 const router = express.Router();
 
@@ -10,12 +10,29 @@ router.post('/issue', async (req, res) => {
       return res.status(400).json({ error: 'Missing campaignId' });
     }
     await issueCertificates(campaignId);
-    res.json({ success: true, message: 'Đã cấp chứng nhận thành công' });
+    res.json({ success: true, message: 'Đã cấp chứng nhận hàng loạt thành công' });
   } catch (error) {
     if (error.message.includes('ORA-')) {
       res.status(400).json({ error: 'Lỗi CSDL: ' + error.message.split('\n')[0] });
     } else {
       res.status(500).json({ error: 'Failed to issue certificates' });
+    }
+  }
+});
+
+router.post('/issue-single', async (req, res) => {
+  try {
+    const { maThamGia } = req.body;
+    if (!maThamGia) {
+      return res.status(400).json({ error: 'Thiếu mã tham gia' });
+    }
+    await issueSingleCertificate(maThamGia);
+    res.json({ success: true, message: 'Đã cấp chứng nhận thành công' });
+  } catch (error) {
+    if (error.message.includes('ORA-')) {
+      res.status(400).json({ error: 'Lỗi CSDL: ' + error.message.split('\n')[0] });
+    } else {
+      res.status(500).json({ error: error.message });
     }
   }
 });

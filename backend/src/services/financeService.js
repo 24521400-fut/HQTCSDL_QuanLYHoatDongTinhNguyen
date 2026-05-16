@@ -1,5 +1,7 @@
 import { getConnection } from '../db.js';
 import oracledb from 'oracledb';
+import fs from 'fs';
+import path from 'path';
 
 export async function recordDonation(maTK, maCD, soTien, phuongThuc) {
   let connection;
@@ -50,7 +52,7 @@ export async function recordDonation(maTK, maCD, soTien, phuongThuc) {
   }
 }
 
-export async function requestExpense(maCD, tenKhoanChi, soTien, mucDich, maNguoiChi) {
+export async function requestExpense(maCD, tenKhoanChi, soTien, mucDich, maNguoiChi, hinhAnhUrl) {
   let connection;
   try {
     connection = await getConnection();
@@ -88,10 +90,36 @@ export async function requestExpense(maCD, tenKhoanChi, soTien, mucDich, maNguoi
     
     if (ctResult.rows.length > 0) {
       const maChiTieu = ctResult.rows[0].MACHITIEU || ctResult.rows[0].MaChiTieu;
-      await connection.execute(
-        `UPDATE ChiTieu SET TenKhoanChi = :tenKhoanChi, MaNguoiChi = :maNguoiChi WHERE MaChiTieu = :maChiTieu`,
-        { tenKhoanChi, maNguoiChi, maChiTieu }
+      
+      // 5. Tạo minh chứng ngay lập tức
+      const mcResult = await connection.execute(
+        `INSERT INTO MinhChungChiTieu(MaMinhChung, HinhAnh_URL, LoaiMinhChung, NgayCapNhat, GhiChu)
+         VALUES ('MC' || LPAD(s_minhchungct_id.NEXTVAL, 8, '0'), :hinhAnhUrl, 'HoaDon', SYSDATE, :ghiChu)
+         RETURNING MaMinhChung INTO :maMinhChungOut`,
+        { 
+          hinhAnhUrl, 
+          ghiChu: `Tự động tạo từ yêu cầu chi: ${tenKhoanChi}`,
+          maMinhChungOut: { type: oracledb.STRING, dir: oracledb.BIND_OUT }
+        }
       );
+      const maMinhChung = mcResult.outBinds.maMinhChungOut[0];
+
+      // 6. Cập nhật khoản chi và người chi
+      await connection.execute(
+        `UPDATE ChiTieu SET TenKhoanChi = :tenKhoanChi, MaNguoiChi = :maNguoiChi, MaMinhChung = :maMinhChung WHERE MaChiTieu = :maChiTieu`,
+        { tenKhoanChi, maNguoiChi, maMinhChung, maChiTieu }
+      );
+
+      // 7. Ghi Log Audit (Truy vết)
+      try {
+        const logDir = path.join(process.cwd(), 'logs');
+        if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+        const logFile = path.join(logDir, 'finance_audit.log');
+        const logEntry = `[${new Date().toLocaleString('vi-VN')}] | USER: ${maNguoiChi} | ACTION: REQUEST_EXPENSE | CD: ${maCD} | AMOUNT: ${soTien.toLocaleString()} | NAME: ${tenKhoanChi} | PROOF: ${hinhAnhUrl}\n`;
+        fs.appendFileSync(logFile, logEntry);
+      } catch (logErr) {
+        console.error('Failed to write audit log:', logErr);
+      }
     }
     
     await connection.commit();

@@ -1,92 +1,137 @@
-.analytics-page-container {
-  padding: 24px;
+.analytics-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 30px;
+}
+
+.header-info h1 {
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, #2c3e50, #4ca1af);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.campaign-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.8);
+  padding: 10px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  backdrop-filter: blur(10px);
+}
+
+.campaign-selector label {
+  font-weight: 700;
+  color: #444;
+}
+
+.campaign-selector select {
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
 }
 
 .analytics-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 25px;
 }
 
-.leaderboard {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.leader-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-}
-
-.rank-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #0D1B2A;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-right: 16px;
-}
-
-.leader-item.rank-1 .rank-badge {
-  background-color: #fbbf24; /* Gold */
-}
-
-.leader-item.rank-2 .rank-badge {
-  background-color: #9ca3af; /* Silver */
-}
-
-.leader-item.rank-3 .rank-badge {
-  background-color: #b45309; /* Bronze */
-}
-
-.leader-info {
-  flex-grow: 1;
-}
-
-.leader-info h4 {
-  margin: 0 0 4px 0;
-  color: #0D1B2A;
-}
-
-.leader-info p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.leader-score {
-  font-weight: 700;
-  color: #F58220;
-  font-size: 1.1rem;
-}
-
-.param-value-badge {
-  background-color: #e0e7ff;
-  color: #4338ca;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-.param-desc {
-  font-style: italic;
-  color: #6b7280;
+.chart-wrapper {
+  height: 400px;
   margin-bottom: 20px;
 }
 
-.param-desc-cell {
-  max-width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.finance-summary {
+  padding-top: 15px;
+  border-top: 1px dashed #ddd;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+}
+
+.summary-item .label {
+  color: #666;
+  font-weight: 600;
+}
+
+.summary-item .value.plus { color: #2ecc71; font-weight: 800; }
+.summary-item .value.minus { color: #e74c3c; font-weight: 800; }
+
+/* Hall of Fame */
+.top-tnv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.tnv-rank-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  transition: all 0.2s;
+}
+
+.tnv-rank-item:hover {
+  transform: translateX(5px);
+  background: #fff;
+  border-color: #ff8c00;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.rank-badge {
+  width: 35px;
+  height: 35px;
+  background: #24292e;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.tnv-rank-item:nth-child(1) .rank-badge { background: #ffd700; color: #000; }
+.tnv-rank-item:nth-child(2) .rank-badge { background: #c0c0c0; color: #000; }
+.tnv-rank-item:nth-child(3) .rank-badge { background: #cd7f32; color: #000; }
+
+.tnv-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.tnv-name {
+  font-weight: 700;
+  color: #333;
+}
+
+.tnv-stats {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.loading, .empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-style: italic;
 }

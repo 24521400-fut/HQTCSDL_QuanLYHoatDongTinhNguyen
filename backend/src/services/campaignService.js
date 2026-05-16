@@ -112,3 +112,21 @@ export async function getMyEnrollments(maTK) {
     }
   }
 }
+export async function getManagedCampaign(maTK) {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT c.MaChienDich, c.TenChienDich FROM ChienDich c 
+       JOIN BanDieuHanh b ON c.MaChienDich = b.MaChienDich 
+       WHERE b.MaTaiKhoan = :maTK`,
+      { maTK },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    return result.rows;
+  } catch (error) {
+    throw error;
+  } finally {
+    if (connection) await connection.close();
+  }
+}

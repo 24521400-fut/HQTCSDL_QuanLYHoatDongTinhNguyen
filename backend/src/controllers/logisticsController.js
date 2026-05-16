@@ -17,6 +17,16 @@ router.get('/inventory', async (req, res) => {
   }
 });
 
+router.get('/inventory/:maCD', async (req, res) => {
+  try {
+    const { maCD } = req.params;
+    const inventory = await getInventory(maCD);
+    res.json(inventory);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.post('/stock-in', async (req, res) => {
   try {
     const { maCD, maLoai, soLuong } = req.body;

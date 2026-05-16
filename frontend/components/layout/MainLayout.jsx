@@ -24,26 +24,26 @@ const MainLayout = ({ children }) => {
   // Define sidebar menus based on role
   const menus = {
     BanQuanLy: [
-      { label: "Duyệt tài khoản TNV", path: "/admin/approve-volunteer" },
+      { label: "Quản trị tài khoản", path: "/admin/approve-volunteer" },
       { label: "Tạo chiến dịch", path: "/admin/create-campaign" },
-      { label: "Tài chính & Ngân quỹ", path: "/admin/finance" },
-      { label: "Quản lý hậu cần", path: "/executive/logistics" },
+      { label: "Tài trợ và Quyên góp", path: "/admin/finance" },
       { label: "Cấp chứng nhận", path: "/admin/certification" },
       { label: "Báo cáo thống kê", path: "/admin/analytics" },
+      { label: "Cấu hình hệ thống", path: "/admin/config" },
       { label: "Hồ sơ cá nhân", path: "/profile" },
     ],
     BanDieuHanh: [
+      { label: "Bảng Điều Hành", path: "/executive/dashboard" },
       { label: "Duyệt tham gia CD", path: "/executive/approve-participation" },
-      { label: "Đối soát & Điểm danh", path: "/executive/proof-review" },
       { label: "Đánh giá TNV", path: "/executive/evaluation" },
-      { label: "Quản lý hậu cần", path: "/executive/logistics" },
-      { label: "Tài chính & Ngân quỹ", path: "/admin/finance" },
+      { label: "Quản lý vật phẩm", path: "/executive/logistics" },
+      { label: "Tài chính & Ngân quỹ", path: "/executive/finance" },
       { label: "Hồ sơ cá nhân", path: "/profile" },
     ],
     TinhNguyenVien: [
+      { label: "Dashboard", path: "/volunteer/dashboard" },
       { label: "Đăng ký chiến dịch", path: "/volunteer/campaigns" },
       { label: "Lịch sử hoạt động", path: "/volunteer/history" },
-      { label: "Nộp minh chứng", path: "/volunteer/proof-upload" },
       { label: "Chứng nhận của tôi", path: "/volunteer/certificates" },
       { label: "Hồ sơ cá nhân", path: "/profile" },
     ],
@@ -81,7 +81,7 @@ const MainLayout = ({ children }) => {
             <ThongBaoDropdown />
           </div>
         </header>
-        <div className="page-wrapper">
+        <div className="page-wrapper page-transition">
           {children}
         </div>
       </main>

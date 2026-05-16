@@ -1,0 +1,29 @@
+.glass-campaign-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(13, 27, 42, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #0D1B2A;
+}
+
+.glass-campaign-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px 0 rgba(13, 27, 42, 0.15);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.glass-campaign-card .card-header h3 {
+  margin: 0 0 10px 0;
+  color: #F58220;
+  font-size: 1.2rem;
+}
+
+.glass-campaign-card .card-body p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}

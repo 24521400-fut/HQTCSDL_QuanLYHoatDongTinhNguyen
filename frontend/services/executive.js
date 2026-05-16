@@ -35,3 +35,34 @@ export const assignTask = async (assignmentData) => {
   }
   return data;
 };
+
+const BDH_URL = "http://localhost:3000/api/bdh";
+
+export const getEvaluationList = async (maCD) => {
+  const response = await fetch(`${BDH_URL}/evaluation/list/${maCD}`);
+  return await response.json();
+};
+
+export const approveEvaluation = async (id, diem) => {
+  const response = await fetch(`${BDH_URL}/evaluation/approve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ maThamGia: id, diem }),
+  });
+  return await response.json();
+};
+
+export const rejectEvaluation = async (maThamGia, lyDo, proofUrl) => {
+  const response = await fetch(`${BDH_URL}/evaluation/reject`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ maThamGia, lyDo, proofUrl })
+  });
+  return await response.json();
+};
+
+export const getAssignedCampaign = async (maTK) => {
+  const response = await fetch(`${BDH_URL}/assigned-campaign/${maTK}`);
+  if (!response.ok) throw new Error("Không thể lấy chiến dịch được giao");
+  return await response.json();
+};

@@ -21,10 +21,9 @@ const LoginPage = () => {
     try {
       const user = await loginApi(tenDangNhap, matKhau);
       login(user);
-      // Điều hướng dựa trên vai trò
       if (user.VaiTro === "BanQuanLy") navigate("/admin/approve-volunteer");
-      else if (user.VaiTro === "BanDieuHanh") navigate("/executive/approve-participation");
-      else navigate("/volunteer/campaigns");
+      else if (user.VaiTro === "BanDieuHanh") navigate("/executive/dashboard");
+      else navigate("/volunteer/dashboard");
     } catch (error) {
       setModal({ isOpen: true, message: error });
     } finally {
@@ -64,8 +63,8 @@ const LoginPage = () => {
               required
               placeholder="Nhập mật khẩu..."
             />
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="eye-icon"
               onClick={() => setShowPassword(!showPassword)}
             >

@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getProfile, updateProfile } from "../../services/auth";
 import SystemModal from "../../components/common/SystemModal";
 import NullAvtIcon from "../../assets/NullAvtIcon.png";
+import MainLayout from "../../components/layout/MainLayout";
 import "./ProfilePage.css";
 
 const ProfilePage = () => {
@@ -85,11 +86,12 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading) return <div className="profile-loading">Đang tải hồ sơ...</div>;
-  if (!profile) return <div className="profile-error">Không có thông tin.</div>;
+  if (loading) return <MainLayout><div className="profile-loading">Đang tải hồ sơ...</div></MainLayout>;
+  if (!profile) return <MainLayout><div className="profile-error">Không có thông tin.</div></MainLayout>;
 
   return (
-    <div className="profile-container">
+    <MainLayout>
+      <div className="profile-container">
       <SystemModal
         isOpen={modal.isOpen}
         title={modal.title}
@@ -231,7 +233,8 @@ const ProfilePage = () => {
         </form>
       </div>
       )}
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

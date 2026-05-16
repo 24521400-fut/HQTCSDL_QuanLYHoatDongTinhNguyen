@@ -44,3 +44,11 @@ export const getMyEnrollments = async (maTK) => {
   }
   return response.json();
 };
+export const getManagedCampaigns = async (maTK) => {
+  const response = await fetch(`${API_URL}/campaigns/managed/${maTK}`);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Không thể tải danh sách chiến dịch điều hành");
+  }
+  return response.json();
+};

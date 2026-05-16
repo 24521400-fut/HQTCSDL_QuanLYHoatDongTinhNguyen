@@ -11,11 +11,11 @@ export const recordDonation = async (maTK, maCD, soTien, phuongThuc) => {
   return data;
 };
 
-export const requestExpense = async (maCD, tenKhoanChi, soTien, mucDich, maNguoiChi) => {
+export const requestExpense = async (maCD, tenKhoanChi, soTien, mucDich, maNguoiChi, hinhAnhUrl) => {
   const response = await fetch(`${API_URL}/expense`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ maCD, tenKhoanChi, soTien, mucDich, maNguoiChi }),
+    body: JSON.stringify({ maCD, tenKhoanChi, soTien, mucDich, maNguoiChi, hinhAnhUrl }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Failed to request expense");

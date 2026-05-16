@@ -13,6 +13,19 @@ export const issueCertificates = async (campaignId) => {
   return await response.json();
 };
 
+export const issueSingleCertificate = async (maThamGia) => {
+  const response = await fetch(`${API_URL}/issue-single`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ maThamGia })
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Lỗi khi cấp chứng nhận');
+  }
+  return await response.json();
+};
+
 export const getEligibleVolunteers = async (campaignId) => {
   const response = await fetch(`${API_URL}/eligible/${campaignId}`);
   if (!response.ok) {

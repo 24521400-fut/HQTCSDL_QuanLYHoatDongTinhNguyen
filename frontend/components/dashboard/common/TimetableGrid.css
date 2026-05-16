@@ -1,0 +1,135 @@
+/* ===== Timetable Grid - Activity Schedule ===== */
+
+.academic-timetable {
+  padding: 0.75rem;
+  background: white;
+  border-radius: 12px;
+}
+
+.timetable-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header-left h3 {
+  margin: 0;
+  color: #0D1B2A;
+  font-size: 1.1rem;
+}
+
+.date-range {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.timetable-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  padding: 0.4rem 0.8rem;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: #e5e7eb;
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.grid-wrapper {
+  overflow-x: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.tkb-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.tkb-table th,
+.tkb-table td {
+  border: 1px solid #dee2e6;
+  padding: 0;
+  text-align: center;
+}
+
+.tkb-table th {
+  background: #f1f3f5;
+  font-weight: 700;
+  color: #374151;
+  padding: 0.5rem 0.25rem;
+}
+
+.th-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.day-label {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+/* ===== Sticky Time Column ===== */
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background: #f1f3f5 !important;
+  z-index: 5;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.06);
+  width: 100px;
+  min-width: 100px;
+}
+
+.period-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.p-time {
+  font-size: 0.72rem;
+  color: #495057;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== Grid Cells & Session Containers ===== */
+.tkb-cell {
+  height: 35px;
+  vertical-align: top;
+  padding: 0 !important;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  position: relative;
+  overflow: visible;
+}
+
+.session-cell {
+  padding: 0 !important;
+  vertical-align: top;
+}
+
+.session-relative-container {
+  position: relative;
+  width: 100%;
+  /* Height is set dynamically from JS based on session period count */
+}

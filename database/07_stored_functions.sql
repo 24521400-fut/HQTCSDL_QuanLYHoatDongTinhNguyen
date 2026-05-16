@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- FILE: 07_stored_functions.sql
 -- MUC DICH: Implement 6 SFs
 -- ============================================================
@@ -93,25 +93,39 @@ CREATE OR REPLACE FUNCTION SF_GET_XEP_LOAI (
 ) RETURN VARCHAR2
 AS
     v_Diem NUMBER; v_Gio NUMBER;
-    v_DiemXS NUMBER; v_GioXS NUMBER;
-    v_DiemT NUMBER; v_GioT NUMBER;
-    v_DiemK NUMBER; v_GioK NUMBER;
+    v_NgayBD DATE; v_NgayKT DATE;
+    v_TotalHours NUMBER;
+    v_MaCD VARCHAR2(10);
+    v_DiemXS NUMBER; v_DiemT NUMBER; v_DiemK NUMBER;
 BEGIN
-    SELECT NVL(DiemDanhGia, 0) INTO v_Diem FROM ThamGiaTNV WHERE MaThamGia = p_MaThamGia;
-    SELECT NVL(SUM(SoGioGhiNhan), 0) INTO v_Gio FROM DiemDanh WHERE MaThamGia = p_MaThamGia;
+    -- 1. Get Score and Campaign info
+    SELECT NVL(DiemDanhGia, 0), MaChienDich INTO v_Diem, v_MaCD 
+    FROM ThamGiaTNV WHERE MaThamGia = p_MaThamGia;
     
+    -- 2. Calculate Total Campaign Hours (24 * days)
+    SELECT NgayBatDau, NVL(NgayKetThuc, SYSDATE) INTO v_NgayBD, v_NgayKT 
+    FROM ChienDich WHERE MaChienDich = v_MaCD;
+    
+    v_TotalHours := (v_NgayKT - v_NgayBD + 1) * 24;
+    IF v_TotalHours <= 0 THEN v_TotalHours := 24; END IF;
+
+    -- 3. Calculate Total Hours Assigned
+    SELECT NVL(SUM(NVL(cv.ThoiGianKetThuc - cv.ThoiGianBatDau, 0) * 24), 0) INTO v_Gio 
+    FROM PhanCong pc
+    JOIN CongViec cv ON pc.MaCongViec = cv.MaCongViec
+    WHERE pc.MaThamGia = p_MaThamGia AND pc.TrangThai != 'HuyBo';
+    
+    -- 4. Get Score Thresholds from ThamSo
     SELECT TO_NUMBER(GiaTri) INTO v_DiemXS FROM ThamSo WHERE TenThamSo = 'DIEM_XUAT_SAC';
-    SELECT TO_NUMBER(GiaTri) INTO v_GioXS FROM ThamSo WHERE TenThamSo = 'GIO_XUAT_SAC';
     SELECT TO_NUMBER(GiaTri) INTO v_DiemT FROM ThamSo WHERE TenThamSo = 'DIEM_TOT';
-    SELECT TO_NUMBER(GiaTri) INTO v_GioT FROM ThamSo WHERE TenThamSo = 'GIO_TOT';
     SELECT TO_NUMBER(GiaTri) INTO v_DiemK FROM ThamSo WHERE TenThamSo = 'DIEM_KHA';
-    SELECT TO_NUMBER(GiaTri) INTO v_GioK FROM ThamSo WHERE TenThamSo = 'GIO_KHA';
     
-    IF v_Diem >= v_DiemXS AND v_Gio >= v_GioXS THEN
+    -- 5. Ranking Logic based on % of Campaign Duration
+    IF v_Diem >= v_DiemXS AND v_Gio >= (0.8 * v_TotalHours) THEN
         RETURN 'XuatSac';
-    ELSIF v_Diem >= v_DiemT AND v_Gio >= v_GioT THEN
+    ELSIF v_Diem >= v_DiemT AND v_Gio >= (0.7 * v_TotalHours) THEN
         RETURN 'Tot';
-    ELSIF v_Diem >= v_DiemK AND v_Gio >= v_GioK THEN
+    ELSIF v_Diem >= v_DiemK AND v_Gio >= (0.6 * v_TotalHours) THEN
         RETURN 'Kha';
     ELSE
         RETURN 'TrungBinh';

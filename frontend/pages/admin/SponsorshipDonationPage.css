@@ -1,0 +1,210 @@
+.sponsor-mgmt-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 30px;
+}
+
+.header-info h1 {
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, #ff8c00, #ff4500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 5px;
+}
+
+.header-info p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.campaign-selector-box {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.campaign-selector-box label {
+  font-weight: 700;
+  color: #444;
+}
+
+.campaign-selector-box select {
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.mgmt-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.full-width-section {
+  width: 100%;
+}
+
+/* Inventory Grid */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 10px 0;
+}
+
+.inv-item-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #eee;
+  transition: all 0.2s;
+}
+
+.inv-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.inv-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.inv-name {
+  font-weight: 700;
+  color: #333;
+}
+
+.inv-unit {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.inv-qty {
+  font-size: 1.2rem;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 8px;
+}
+
+.inv-qty.active {
+  background: #e6ffed;
+  color: #22863a;
+}
+
+.inv-qty.empty {
+  background: #ffeef0;
+  color: #d73a49;
+}
+
+/* Pending Grid */
+.pending-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.pending-item {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item-donor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.badge.TaiTro { background: #e1f5fe; color: #0288d1; }
+.badge.QuyenGop { background: #f3e5f5; color: #7b1fa2; }
+.badge.VP { background: #fff3e0; color: #ef6c00; }
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-amount {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.item-meta {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.approve-btn {
+  background: #24292e;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.approve-btn:hover {
+  background: #ff8c00;
+  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+}
+
+.empty-list {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-style: italic;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 50px;
+  color: #ff8c00;
+  font-weight: 700;
+}

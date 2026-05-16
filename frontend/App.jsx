@@ -17,6 +17,7 @@ import ApproveParticipationPage from "./pages/executive/ApproveParticipationPage
 import AttendancePage from "./pages/executive/AttendancePage";
 import LogisticsPage from "./pages/executive/LogisticsPage";
 import ProofReviewPage from "./pages/executive/ProofReviewPage";
+import DashboardBDH from "./pages/executive/DashboardBDH";
 
 import CampaignsPage from "./pages/volunteer/CampaignsPage";
 import HistoryPage from "./pages/volunteer/HistoryPage";
@@ -26,6 +27,12 @@ import EvaluationPage from "./pages/executive/EvaluationPage";
 import CertificationPage from "./pages/admin/CertificationPage";
 import AnalyticsDashboard from "./pages/admin/AnalyticsDashboard";
 import MyCertificatesPage from "./pages/volunteer/MyCertificatesPage";
+import DashboardTNV from "./pages/tnv/DashboardTNV";
+import TrangChiTietChienDich from "./pages/tnv/TrangChiTietChienDich";
+import TaskDetailPage from "./pages/executive/TaskDetailPage";
+import SponsorshipDonationPage from "./pages/admin/SponsorshipDonationPage";
+import SystemConfigPage from "./pages/admin/SystemConfigPage";
+import ExecutiveFinancePage from "./pages/executive/ExecutiveFinancePage";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -37,8 +44,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (allowedRoles && !allowedRoles.includes(user.VaiTro)) {
     // If not allowed, send to appropriate default route based on role
     if (user.VaiTro === "BanQuanLy") return <Navigate to="/admin/approve-volunteer" replace />;
-    if (user.VaiTro === "BanDieuHanh") return <Navigate to="/executive/approve-participation" replace />;
-    return <Navigate to="/volunteer/campaigns" replace />;
+    if (user.VaiTro === "BanDieuHanh") return <Navigate to="/executive/dashboard" replace />;
+    return <Navigate to="/volunteer/dashboard" replace />;
   }
 
   return children;
@@ -55,13 +62,13 @@ function App() {
           
           <Route path="/profile" element={
             <ProtectedRoute>
-              <MainLayout><ProfilePage /></MainLayout>
+              <ProfilePage />
             </ProtectedRoute>
           } />
           
           <Route path="/notifications" element={
             <ProtectedRoute>
-              <MainLayout><ThongBaoList /></MainLayout>
+              <ThongBaoList />
             </ProtectedRoute>
           } />
 
@@ -77,8 +84,8 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/admin/finance" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy", "BanDieuHanh"]}>
-              <FinancePage />
+            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+              <SponsorshipDonationPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/certification" element={
@@ -91,8 +98,18 @@ function App() {
               <AnalyticsDashboard />
             </ProtectedRoute>
           } />
+          <Route path="/admin/config" element={
+            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+              <SystemConfigPage />
+            </ProtectedRoute>
+          } />
 
           {/* Executive Routes */}
+          <Route path="/executive/dashboard" element={
+            <ProtectedRoute allowedRoles={["BanDieuHanh"]}>
+              <DashboardBDH />
+            </ProtectedRoute>
+          } />
           <Route path="/executive/approve-participation" element={
             <ProtectedRoute allowedRoles={["BanDieuHanh"]}>
               <ApproveParticipationPage />
@@ -104,7 +121,7 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/executive/logistics" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy", "BanDieuHanh"]}>
+            <ProtectedRoute allowedRoles={["BanDieuHanh"]}>
               <LogisticsPage />
             </ProtectedRoute>
           } />
@@ -118,11 +135,31 @@ function App() {
               <EvaluationPage />
             </ProtectedRoute>
           } />
+          <Route path="/executive/finance" element={
+            <ProtectedRoute allowedRoles={["BanDieuHanh"]}>
+              <ExecutiveFinancePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/executive/task/:id" element={
+            <ProtectedRoute allowedRoles={["BanDieuHanh"]}>
+              <TaskDetailPage />
+            </ProtectedRoute>
+          } />
 
           {/* Volunteer Routes */}
+          <Route path="/volunteer/dashboard" element={
+            <ProtectedRoute allowedRoles={["TinhNguyenVien"]}>
+              <DashboardTNV />
+            </ProtectedRoute>
+          } />
           <Route path="/volunteer/campaigns" element={
             <ProtectedRoute allowedRoles={["TinhNguyenVien"]}>
               <CampaignsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/volunteer/campaigns/:id" element={
+            <ProtectedRoute allowedRoles={["TinhNguyenVien"]}>
+              <TrangChiTietChienDich />
             </ProtectedRoute>
           } />
           <Route path="/volunteer/history" element={
@@ -142,6 +179,7 @@ function App() {
           } />
 
           {/* Default Route */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

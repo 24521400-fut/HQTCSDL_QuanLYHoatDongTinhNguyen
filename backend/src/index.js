@@ -17,6 +17,10 @@ import proofRoutes from './controllers/proofController.js';
 import evaluationRoutes from './controllers/evaluationController.js';
 import certificationRoutes from './controllers/certificationController.js';
 import statisticsRoutes from './controllers/statisticsController.js';
+import tnvRoutes from './controllers/tnvController.js';
+import bdhDashboardRoutes from './controllers/bdhDashboardController.js';
+import adminRoutes from './controllers/adminController.js';
+import adminFinanceRoutes from './controllers/adminFinanceController.js';
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -29,6 +33,10 @@ app.use('/api/proof', proofRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/certification', certificationRoutes);
 app.use('/api/statistics', statisticsRoutes);
+app.use('/api/tnv', tnvRoutes);
+app.use('/api/bdh', bdhDashboardRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/admin-finance', adminFinanceRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

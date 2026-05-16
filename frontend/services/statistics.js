@@ -39,3 +39,14 @@ export const updateParameter = async (maTS, giaTriMoi) => {
   }
   return await response.json();
 };
+export const getCampaignStats = async (campaignId) => {
+  const response = await fetch(`${API_URL}/campaign/${campaignId}/stats`);
+  if (!response.ok) throw new Error('Lỗi tải thống kê thu chi');
+  return await response.json();
+};
+
+export const getTopVolunteers = async (campaignId) => {
+  const response = await fetch(`${API_URL}/campaign/${campaignId}/top-volunteers`);
+  if (!response.ok) throw new Error('Lỗi tải bảng vinh danh');
+  return await response.json();
+};

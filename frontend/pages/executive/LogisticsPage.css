@@ -50,6 +50,40 @@
   gap: 24px;
 }
 
+.logistics-grid-container {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 24px;
+}
+
+.logistics-forms-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.logistics-logs-column {
+  min-width: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.current-campaign-badge {
+  background: rgba(245, 130, 32, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #F58220;
+  color: #0D1B2A;
+}
+
+.current-campaign-badge strong {
+  color: #F58220;
+}
+
 .text-success {
   color: #4CAF50;
   font-weight: 600;

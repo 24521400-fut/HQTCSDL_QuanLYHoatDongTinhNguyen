@@ -34,10 +34,48 @@
 }
 
 .eval-badge {
-  padding: 4px 12px;
+  padding: 5px 10px; /* Slightly reduced padding */
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 0.8rem; /* Slightly smaller font */
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 90px;
+}
+
+.score-text {
   font-weight: 600;
+  color: var(--primary-color);
+  background: rgba(255, 140, 0, 0.1);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.score-input-inline {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.score-input-inline:focus {
+  border-color: var(--primary-color);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.custom-table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.custom-table th:first-child, .custom-table td:first-child {
+  text-align: left;
 }
 
 .badge-gold {
@@ -101,4 +139,167 @@
   border-color: #F58220;
   box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.3);
   background-color: white;
+}
+
+/* New Styles for Evaluation Refactor */
+.header-left h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.campaign-context-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 130, 32, 0.1);
+  color: #f58220;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(245, 130, 32, 0.2);
+}
+
+.campaign-context-badge .dot {
+  width: 8px;
+  height: 8px;
+  background-color: #f58220;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #f58220;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+.mssv-tag {
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 600;
+  color: #475569;
+}
+
+.tnv-name-cell {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.hour-badge-dynamic {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.score-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.action-group {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-approve-sm, .btn-reject-sm {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-approve-sm {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-approve-sm:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-reject-sm {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-reject-sm:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.sub-text {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+.approve-btn-final, .reject-btn-final {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.approve-btn-final {
+  background: #10b981;
+  color: white;
+}
+
+.reject-btn-final {
+  background: #ef4444;
+  color: white;
+}
+
+.reject-btn-final:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.file-upload-wrapper {
+  position: relative;
+  margin-top: 8px;
+}
+
+.file-upload-wrapper input[type="file"] {
+  display: none;
+}
+
+.file-label {
+  display: block;
+  padding: 12px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.file-label:hover {
+  border-color: #f58220;
+  background: #fff7ed;
+  color: #f58220;
 }

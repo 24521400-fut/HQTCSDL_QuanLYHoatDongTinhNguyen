@@ -1,0 +1,175 @@
+.tnv-dashboard-layout {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  height: 100%;
+  color: #0D1B2A;
+}
+
+.tnv-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tnv-sidebar {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Glass Notification Banner */
+.glass-notification-banner {
+  background: white;
+  border: 1px solid rgba(245, 130, 32, 0.2);
+  border-left: 6px solid #F58220;
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.banner-content {
+  animation: pageFadeIn 0.5s ease;
+}
+
+.banner-content h4 {
+  margin: 0 0 8px 0;
+  color: #F58220;
+  font-size: 1.1rem;
+}
+
+.banner-content p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.notif-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+  opacity: 0.5;
+}
+
+.banner-indicators {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.dot-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background 0.3s ease;
+}
+
+.dot-indicator.active {
+  background: #F58220;
+}
+
+/* Search Bar */
+.search-bar-container {
+  margin-bottom: 20px;
+}
+
+.glass-search-input {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(13, 27, 42, 0.2);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  color: #0D1B2A;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #0D1B2A;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.clear-search-btn:hover {
+  opacity: 1;
+}
+
+.glass-search-input:focus {
+  border-color: #F58220;
+}
+
+/* Campaigns Section */
+.campaign-list-section h2, .tnv-sidebar h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #F58220;
+}
+
+/* Upcoming Events Preview */
+.upcoming-events-preview {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(13, 27, 42, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  color: #0D1B2A;
+}
+
+.upcoming-events-preview h3 {
+  margin: 0 0 16px 0;
+  color: #F58220;
+}
+
+.preview-event-card {
+  padding: 12px;
+  background: rgba(13, 27, 42, 0.05);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 4px solid #4CAF50;
+}
+
+.event-date {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.preview-event-card p {
+  margin: 4px 0 0 0;
+  font-weight: 500;
+}
+
+.no-events {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+
+
+.loading-state, .error-state {
+  padding: 40px;
+  text-align: center;
+  color: #0D1B2A;
+  font-size: 1.2rem;
+}
+
+.error-state {
+  color: #ff5252;
+}

@@ -21,6 +21,7 @@ Hệ thống Quản Lý Hoạt Động Tình Nguyện Sinh Viên — một ứng
 | **Database** | Oracle | 19c (Non-CDB) | Lưu trữ dữ liệu, SP/SF/Trigger |
 | **Oracle Client** | Thin Mode | N/A | Driver Node.js (`oracledb`) kết nối Oracle không cần Instant Client |
 | **Package Manager** | npm | 10.x | Quản lý dependencies |
+| **Charts** | Chart.js | 4.x | Thư viện vẽ biểu đồ thống kê |
 
 ### Thư viện Backend chính (`backend/package.json`)
 
@@ -38,6 +39,7 @@ Hệ thống Quản Lý Hoạt Động Tình Nguyện Sinh Viên — một ứng
 |:---|:---|
 | `react-router-dom` | Routing giữa các trang |
 | `react` / `react-dom` | Core UI framework |
+| `chart.js` / `react-chartjs-2` | Hiển thị biểu đồ báo cáo tài chính |
 | `axios` / `fetch` | Giao tiếp với Backend API |
 
 ---
@@ -53,19 +55,20 @@ Hệ thống Quản Lý Hoạt Động Tình Nguyện Sinh Viên — một ứng
 │  │  frontend/pages/      → Các trang chính           │  │
 │  │  frontend/components/ → UI components tái sử dụng │  │
 │  │  frontend/services/   → Gọi REST API (Axios/Fetch)│  │
+│  │  frontend/context/    → Quản lý Auth/State        │  │
 │  └──────────────────────┬────────────────────────────┘  │
 │                         │ HTTP GET/POST/PUT/DELETE      │
 │                         │ (localhost:3000/api/...)      │
 │  ┌──────────────────────▼────────────────────────────┐  │
 │  │        BUSINESS LOGIC LAYER (Node.js/Express)     │  │
-│  │  backend/src/controllers/ → Điều hướng request    │  │
-│  │  backend/src/services/    → Logic nghiệp vụ       │  │
-│  │  backend/src/models/      → Schema/DTO mapping    │  │
+│  │  backend/src/controllers/ → Định nghĩa API Routes │  │
+│  │  backend/src/services/    → Logic & Truy vấn SQL  │  │
+│  │  backend/src/db.js        → Oracle Connection     │  │
 │  └──────────────────────┬────────────────────────────┘  │
 │                         │ oracledb Thin Mode            │
 │  ┌──────────────────────▼────────────────────────────┐  │
-│  │       DATA ACCESS LAYER (Node.js → Oracle)        │  │
-│  │  backend/src/db.js        → Connection pool       │  │
+│  │       DATA ACCESS LAYER (Oracle DB)               │  │
+│  │  - Database Migration (Files 09-15)               │  │
 │  │  - Gọi Stored Procedures (CALL SP_XXX)            │  │
 │  │  - Gọi Stored Functions (SELECT SF_XXX FROM DUAL) │  │
 │  └──────────────────────┬────────────────────────────┘  │
@@ -76,11 +79,11 @@ Hệ thống Quản Lý Hoạt Động Tình Nguyện Sinh Viên — một ứng
               │   ORACLE DATABASE     │
               │   19c (Non-CDB)       │
               │                       │
-              │   28 Tables           │
-              │   32 Stored Procs     │
+              │   29 Tables (+1)      │
+              │   34 Stored Procs (+2)│
               │   6  Stored Funcs     │
-              │   33 Triggers         │
-              │   87 Indexes          │
+              │   35 Triggers (+2)    │
+              │   92 Indexes (+5)     │
               └───────────────────────┘
 ```
 
@@ -91,59 +94,38 @@ Hệ thống Quản Lý Hoạt Động Tình Nguyện Sinh Viên — một ứng
 ```
 VolunteerManagementSystem/
 ├── database/                        # ===== LỚP DỮ LIỆU GỐC (Oracle) =====
-│   ├── 00_DB_Script.sql             # File tổng hợp (concat 01→08), deploy nhanh
-│   ├── 01_sequences.sql             # 24 Sequences cho auto-increment PK
-│   ├── 02_tables.sql                # 28 Bảng với FK, CHECK, UNIQUE constraints
-│   ├── 03_indexes.sql               # 87 Indexes tối ưu hiệu năng truy vấn
-│   ├── 04_triggers_auto_pk.sql      # 24 Triggers tự động sinh PK
-│   ├── 05_triggers_business.sql     # 9 Triggers kiểm tra nghiệp vụ
-│   ├── 06_stored_procedures.sql     # 32 Stored Procedures
-│   ├── 07_stored_functions.sql      # 6 Stored Functions
-│   └── 08_SeedData.sql              # Dữ liệu mẫu: 966+ records / 21 bảng
+│   ├── 01→08_Core.sql               # Bộ khung CSDL cơ bản
+│   ├── 09→15_Migrations.sql         # Các bản nâng cấp & Sửa lỗi nghiệp vụ
+│   └── 08_SeedData.sql              # Dữ liệu mẫu thực tế
 │
 ├── docs/                            # ===== TÀI LIỆU DỰ ÁN =====
 │   ├── changelog/                   # Changelog phát triển các module
-│   ├── design.md                    # Quy tắc thiết kế
-│   ├── List_Feat.md                 # Danh sách các tính năng của ứng dụng
 │   ├── Database_Progress.md         # Tracker tiến độ & Changelog database
-│   ├── PROJECT_STRUCTURE.md         # Giải thích cấu trúc dự án
-│   ├── GIT_GUIDELINE.md             # Quy trình Git Flow & branching
-│   ├── GIT_COMMIT.md                # Quy tắc đặt tên commit
-│   └── COMPLETE_Template.docx       # Template tài liệu đồ án
+│   ├── PROJECT_STRUCTURE.md         # Giải thích cấu trúc dự án (FILE NÀY)
+│   └── ...                          # Các tài liệu nghiệp vụ khác
 │
 ├── frontend/                        # ===== TẦNG GIAO DIỆN (React + Vite) =====
-│   ├── assets/                      # Hình ảnh, logo, icon hệ thống
-│   ├── components/                  # Các thành phần UI chuyên nghiệp
-│   │   ├── common/                  # UI Kit dùng chung (Atom components)
-│   │   ├── layout/                  # Thành phần cấu trúc khung
-│   │   └── tables/                  # Các bảng dữ liệu đặc thù
-│   ├── styles/                      # style thiết kế chung 
-│   │   ├── theme.css                # Biến CSS (Primary: Cam, Accent: Xanh đen)
-│   │   └── global.css               # Reset CSS và các style toàn cục
-│   ├── pages/                       # Phân cấp 3 bộ UI khác biệt
-│   │   ├── admin/                   # ----- UI BAN QUẢN LÝ (BQL) -----
-│   │   ├── executive/               # ----- UI BAN ĐIỀU HÀNH (BDH) -----
-│   │   └── volunteer/               # ----- UI TÌNH NGUYỆN VIÊN (TNV) -----
-│   ├── services/                    # Logic giao tiếp với Backend
-│   │   └── api.js                   # Cấu hình Axios/Fetch gọi tới Node.js
-│   ├── App.jsx                      # Cấu hình Routes (BQL, BDH, TNV)
-│   ├── main.jsx                     # Entry point React
-│   └── index.css                    # Global styles
+│   ├── assets/                      # Hình ảnh, logo hệ thống
+│   ├── components/                  # UI components (Atom/Molecule/Organism)
+│   ├── context/                     # Quản lý trạng thái (Auth, Campaign)
+│   ├── styles/                      # Thiết kế giao diện (CSS Variables)
+│   ├── pages/                       # Giao diện chính (Admin/BDH/TNV)
+│   ├── services/                    # Tầng giao tiếp API
+│   ├── App.jsx                      # Root Component & Routes
+│   └── main.jsx                     # Entry point
 │
 ├── backend/                         # ===== TẦNG XỬ LÝ (Node.js/Express) =====
 │   ├── src/
-│   │   ├── controllers/             # Điều hướng request và gọi service (vd: authController.js)
-│   │   ├── services/                # Logic nghiệp vụ & Gọi Oracle (vd: authService.js)
-│   │   ├── models/                  # Định nghĩa Schema/DTO cho Oracle
-│   │   ├── db.js                    # Cấu hình Oracle connection pool
-│   │   └── index.js                 # Entry point cho Express server
-│   └── package.json                 # Dependencies: express, oracledb, dotenv...
+│   │   ├── controllers/             # Định nghĩa Endpoint & Điều hướng
+│   │   ├── services/                # Logic nghiệp vụ & Truy vấn SQL
+│   │   ├── db.js                    # Kết nối Oracle (Thin Mode)
+│   │   └── index.js                 # Khởi chạy Express Server
+│   └── package.json                 # Cấu hình Backend
 │
-├── main.js                          # Entry point cho Electron (Quản lý Window)
-├── index.html                       # HTML entry point cho Vite
-├── package.json                     # Scripts để chạy cả Electron và Vite
+├── main.js                          # Cấu hình Electron (Native Window)
+├── package.json                     # Scripts khởi chạy toàn hệ thống
 ├── vite.config.js                   # Cấu hình Vite
-└── .env                             # Lưu DB_USER, DB_PASSWORD, DB_CONNECTION_STRING
+└── README.md                        # Hướng dẫn cài đặt chuẩn
 ```
 
 ---

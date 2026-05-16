@@ -1,7 +1,8 @@
 const API_URL = "http://localhost:3000/api/logistics";
 
-export const getInventory = async () => {
-  const response = await fetch(`${API_URL}/inventory`);
+export const getInventory = async (maCD) => {
+  const url = maCD ? `${API_URL}/inventory/${maCD}` : `${API_URL}/inventory`;
+  const response = await fetch(url);
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Failed to fetch inventory");
   return data;

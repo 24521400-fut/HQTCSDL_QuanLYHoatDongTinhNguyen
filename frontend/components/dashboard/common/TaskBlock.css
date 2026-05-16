@@ -1,0 +1,55 @@
+/* ===== Task Block - Solid White LMS Style ===== */
+.task-block {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-left: 4px solid #4CAF50; /* Default color, overridden by inline style */
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.task-block:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+  z-index: 20;
+}
+
+.task-block-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 3px 5px;
+  height: 100%;
+  justify-content: flex-start;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.task-block-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.task-block-time {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #e74c3c;
+}
+
+.task-block-vol {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #F58220;
+}
