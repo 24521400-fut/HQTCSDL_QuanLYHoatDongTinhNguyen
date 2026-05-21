@@ -43,7 +43,7 @@ export const issueSingleCertificate = async (maThamGia) => {
     // Issue certificate using the sequence and SF_GET_XEP_LOAI
     await connection.execute(
       `INSERT INTO GiayChungNhan(MaChungNhan, MaThamGia, NgayCap, XepLoai)
-       VALUES (SEQ_GIAYCHUNGNHAN.NEXTVAL, :maThamGia, SYSDATE, SF_GET_XEP_LOAI(:maThamGia2))`,
+       VALUES (NULL, :maThamGia, SYSDATE, SF_GET_XEP_LOAI(:maThamGia2))`,
       { maThamGia, maThamGia2: maThamGia }
     );
     

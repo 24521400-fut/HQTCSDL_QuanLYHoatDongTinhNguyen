@@ -31,6 +31,7 @@ import DashboardTNV from "./pages/tnv/DashboardTNV";
 import TrangChiTietChienDich from "./pages/tnv/TrangChiTietChienDich";
 import TaskDetailPage from "./pages/executive/TaskDetailPage";
 import SponsorshipDonationPage from "./pages/admin/SponsorshipDonationPage";
+import PartnerManagementPage from "./pages/admin/PartnerManagementPage";
 import SystemConfigPage from "./pages/admin/SystemConfigPage";
 import ExecutiveFinancePage from "./pages/executive/ExecutiveFinancePage";
 
@@ -86,6 +87,11 @@ function App() {
           <Route path="/admin/finance" element={
             <ProtectedRoute allowedRoles={["BanQuanLy"]}>
               <SponsorshipDonationPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/partners" element={
+            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+              <PartnerManagementPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/certification" element={

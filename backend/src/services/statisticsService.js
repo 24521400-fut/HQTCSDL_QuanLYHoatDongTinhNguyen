@@ -67,16 +67,21 @@ export async function getCampaignStats(maCD) {
         dr.WeekNum,
         (
           SELECT NVL(SUM(GiaTriTaiTro), 0) FROM TaiTro 
-          WHERE MaChienDich = :maCD AND NgayTaiTro >= dr.WStart AND NgayTaiTro < dr.WEnd
+          WHERE MaChienDich = :maCD 
+            AND NgayTaiTro < dr.WEnd 
+            AND (dr.WeekNum = 1 OR NgayTaiTro >= dr.WStart)
         ) + (
           SELECT NVL(SUM(SoTien), 0) FROM QuyenGopTien qg
           JOIN ThanhToan tt ON qg.MaQuyenGop = tt.MaQuyenGop
           WHERE qg.MaChienDich = :maCD AND tt.TrangThaiThanhToan = 'ThanhCong'
-            AND qg.NgayGiaoDich >= dr.WStart AND qg.NgayGiaoDich < dr.WEnd
+            AND qg.NgayGiaoDich < dr.WEnd 
+            AND (dr.WeekNum = 1 OR qg.NgayGiaoDich >= dr.WStart)
         ) as Income,
         (
           SELECT NVL(SUM(SoTienChi), 0) FROM ChiTieu 
-          WHERE MaChienDich = :maCD AND NgayChi >= dr.WStart AND NgayChi < dr.WEnd
+          WHERE MaChienDich = :maCD 
+            AND NgayChi < dr.WEnd 
+            AND (dr.WeekNum = 1 OR NgayChi >= dr.WStart)
         ) as Expense
       FROM DateRanges dr
       ORDER BY dr.WeekNum

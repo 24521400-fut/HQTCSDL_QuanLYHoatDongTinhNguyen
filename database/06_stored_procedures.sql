@@ -21,7 +21,7 @@ AS
     v_MaTK VARCHAR2(10);
 BEGIN
     INSERT INTO TaiKhoan(MaTaiKhoan, TenDangNhap, MatKhau, Email, VaiTro, TrangThai)
-    VALUES (NULL, p_TenDN, p_MK, p_Email, 'TinhNguyenVien', 'HoatDong')
+    VALUES (NULL, p_TenDN, p_MK, p_Email, 'TinhNguyenVien', 'ChoXacNhan')
     RETURNING MaTaiKhoan INTO v_MaTK;
     
     INSERT INTO HoSoSinhVien(MaHoSo, MaTaiKhoan, HoTen, MSSV, NgaySinh, GioiTinh, Khoa, Lop, SoDienThoai, DiaChi)
@@ -489,3 +489,26 @@ BEGIN
 END;
 /
 
+-- 33. SP_TAO_NHIEMVU_MACDINH
+CREATE OR REPLACE PROCEDURE SP_TAO_NHIEMVU_MACDINH (
+    p_MaCD IN VARCHAR2,
+    p_TenCV IN NVARCHAR2,
+    p_MaCV_Out OUT VARCHAR2
+)
+AS
+    v_count NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM CongViec WHERE MaChienDich = p_MaCD AND TenCongViec = p_TenCV;
+    
+    IF v_count = 0 THEN
+        INSERT INTO CongViec(MaCongViec, MaChienDich, TenCongViec, SoLuongTNVCan)
+        VALUES (NULL, p_MaCD, p_TenCV, 100)
+        RETURNING MaCongViec INTO p_MaCV_Out;
+    ELSE
+        SELECT MaCongViec INTO p_MaCV_Out 
+        FROM CongViec 
+        WHERE MaChienDich = p_MaCD AND TenCongViec = p_TenCV 
+        FETCH FIRST 1 ROWS ONLY;
+    END IF;
+END;
+/

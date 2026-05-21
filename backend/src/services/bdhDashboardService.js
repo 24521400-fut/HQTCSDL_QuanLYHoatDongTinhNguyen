@@ -101,17 +101,24 @@ export async function addGanttTask(maCD, tenCV, moTa, thoiGianBatDau, thoiGianKe
     
     if (maCV.rows.length > 0) {
       const maCongViec = maCV.rows[0].MACONGVIEC || maCV.rows[0].MaCongViec;
+      const toLocalDbString = (dateStr) => {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        const pad = (n) => n.toString().padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      };
+
       await connection.execute(
         `UPDATE CongViec 
          SET MoTa = :moTaJson, 
-             ThoiGianBatDau = TO_DATE(:thoiGianBatDau, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-             ThoiGianKetThuc = TO_DATE(:thoiGianKetThuc, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+             ThoiGianBatDau = TO_DATE(:thoiGianBatDau, 'YYYY-MM-DD HH24:MI:SS'),
+             ThoiGianKetThuc = TO_DATE(:thoiGianKetThuc, 'YYYY-MM-DD HH24:MI:SS'),
              SoLuongTNVCan = :soLuongTNVCan
          WHERE MaCongViec = :maCongViec`,
         { 
           moTaJson, 
-          thoiGianBatDau: new Date(thoiGianBatDau).toISOString().split('.')[0] + 'Z', 
-          thoiGianKetThuc: new Date(thoiGianKetThuc).toISOString().split('.')[0] + 'Z', 
+          thoiGianBatDau: toLocalDbString(thoiGianBatDau), 
+          thoiGianKetThuc: toLocalDbString(thoiGianKetThuc), 
           soLuongTNVCan: parseInt(soLuongTNVCan) || 1,
           maCongViec 
         }
@@ -468,19 +475,28 @@ export async function updateTaskById(maCV, data) {
     
     const moTaJson = JSON.stringify({ desc: data.MoTa, endDate: data.ThoiGianKetThuc || data.ThoiGianBatDau });
     
+    const toLocalDbString = (dateStr) => {
+      if (!dateStr) return null;
+      const d = new Date(dateStr);
+      const pad = (n) => n.toString().padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    };
+
     await connection.execute(
-      `UPDATE CongViec SET 
-        TenCongViec = :ten, 
-        MoTa = :moTa, 
-        ThoiGianBatDau = TO_DATE(:batDau, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-        ThoiGianKetThuc = TO_DATE(:ketThuc, 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
-       WHERE MaCongViec = :maCV`,
-      { 
-        ten: data.TenCongViec, 
-        moTa: moTaJson, 
-        batDau: new Date(data.ThoiGianBatDau).toISOString().split('.')[0] + 'Z', 
-        ketThuc: new Date(data.ThoiGianKetThuc || data.ThoiGianBatDau).toISOString().split('.')[0] + 'Z',
-        maCV 
+      `UPDATE CongViec 
+       SET TenCongViec = :ten, 
+           MoTa = :moTaJson,
+           ThoiGianBatDau = TO_DATE(:batDau, 'YYYY-MM-DD HH24:MI:SS'),
+           ThoiGianKetThuc = TO_DATE(:ketThuc, 'YYYY-MM-DD HH24:MI:SS'),
+           SoLuongTNVCan = :sl
+       WHERE MaCongViec = :id`,
+      {
+        ten: data.TenCongViec,
+        moTaJson,
+        batDau: toLocalDbString(data.ThoiGianBatDau), 
+        ketThuc: toLocalDbString(data.ThoiGianKetThuc || data.ThoiGianBatDau),
+        sl: data.SoLuongTNVCan || 1,
+        id: maCV
       }
     );
     

@@ -53,6 +53,10 @@ const ProofUploadPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedThamGia) {
+      setModal({ isOpen: true, title: "Lỗi", message: "Bạn cần phải được duyệt tham gia ít nhất 1 chiến dịch mới có thể nộp minh chứng.", type: "error" });
+      return;
+    }
     try {
       await uploadProof(selectedThamGia, proofData.hinhAnhUrl, proofData.loai);
       setModal({ isOpen: true, title: "Thành công", message: "Đã nộp minh chứng thành công. Vui lòng chờ BDH duyệt.", type: "success" });

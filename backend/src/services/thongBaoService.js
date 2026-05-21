@@ -10,7 +10,7 @@ export const getNotifications = async (username) => {
     const maTaiKhoan = resultTk.rows[0].MATAIKHOAN;
 
     const sql = `
-      SELECT MaThongBao, TieuDe, NoiDung, TO_CHAR(NgayGui, 'YYYY-MM-DD HH24:MI:SS') as NgayGui, TrangThai, LoaiThongBao
+      SELECT MaThongBao, TieuDe, NoiDung, TO_CHAR(NgayGui, 'YYYY-MM-DD HH24:MI:SS') as NgayGui, TrangThai
       FROM ThongBao
       WHERE MaTaiKhoan = :1
       ORDER BY NgayGui DESC
@@ -22,8 +22,7 @@ export const getNotifications = async (username) => {
       title: row.TIEUDE,
       content: row.NOIDUNG,
       date: row.NGAYGUI,
-      status: row.TRANGTHAI,
-      category: row.LOAITHONGBAO
+      status: row.TRANGTHAI
     }));
   } finally {
     if (conn) {

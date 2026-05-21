@@ -1,0 +1,1 @@
+SELECT MaLoai, TenLoai FROM LoaiVatPham; SELECT HoTen, TongDiem FROM HoSoSinhVien WHERE TongDiem  FETCH FIRST 5 ROWS ONLY; EXIT 
